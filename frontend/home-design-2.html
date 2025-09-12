@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人网站 - 温馨杂志式</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cream-white: #fefefe;
+            --warm-white: #faf9f7;
+            --soft-beige: #f7f5f3;
+            --light-brown: #d7cfc7;
+            --warm-brown: #a08a7a;
+            --deep-brown: #6b5b73;
+            --accent-pink: #f4c2c2;
+            --soft-shadow: 0 4px 20px rgba(107, 91, 115, 0.1);
+            --warm-shadow: 0 8px 30px rgba(107, 91, 115, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', Georgia, serif;
+            background-color: var(--warm-white);
+            color: var(--deep-brown);
+            line-height: 1.8;
+            font-weight: 400;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            background-color: rgba(250, 249, 247, 0.95) !important;
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--light-brown);
+            padding: 1.25rem 0;
+        }
+
+        .navbar-brand {
+            font-family: 'Noto Serif SC', serif;
+            font-weight: 500;
+            font-size: 1.3rem;
+            color: var(--deep-brown) !important;
+        }
+
+        .nav-link {
+            color: var(--warm-brown) !important;
+            font-weight: 400;
+            font-size: 0.95rem;
+            margin: 0 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--deep-brown) !important;
+            transform: translateY(-1px);
+        }
+
+        /* 主要布局 */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem 6rem;
+        }
+
+        /* 头部区域 */
+        .hero-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            margin-bottom: 6rem;
+            padding: 3rem 0;
+        }
+
+        .hero-text {
+            padding-right: 2rem;
+        }
+
+        .hero-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 3rem;
+            font-weight: 300;
+            color: var(--deep-brown);
+            margin-bottom: 2rem;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--warm-brown);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .hero-quote {
+            font-style: italic;
+            font-size: 1.1rem;
+            color: var(--warm-brown);
+            padding-left: 1.5rem;
+            border-left: 3px solid var(--accent-pink);
+            margin: 2rem 0;
+        }
+
+        .hero-image {
+            position: relative;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: var(--soft-shadow);
+        }
+
+        /* 内容区域 */
+        .content-section {
+            margin-bottom: 5rem;
+        }
+
+        .section-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 2.2rem;
+            font-weight: 400;
+            color: var(--deep-brown);
+            margin-bottom: 3rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 2px;
+            background-color: var(--accent-pink);
+        }
+
+        /* 照片杂志式布局 */
+        .photos-magazine {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            grid-template-rows: repeat(3, 200px);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .photo-large {
+            grid-row: span 2;
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: var(--soft-shadow);
+        }
+
+        .photo-medium {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: var(--soft-shadow);
+        }
+
+        .photo-small {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: var(--soft-shadow);
+        }
+
+        .photo-large img,
+        .photo-medium img,
+        .photo-small img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .photo-large:hover img,
+        .photo-medium:hover img,
+        .photo-small:hover img {
+            transform: scale(1.05);
+        }
+
+        /* 照片覆盖文字 */
+        .photo-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(107, 91, 115, 0.8));
+            color: white;
+            padding: 1.5rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .photo-large:hover .photo-overlay,
+        .photo-medium:hover .photo-overlay {
+            transform: translateY(0);
+        }
+
+        /* 视频和时间轴区域 */
+        .bottom-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            margin-top: 4rem;
+        }
+
+        .video-section,
+        .timeline-section {
+            background: var(--cream-white);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: var(--soft-shadow);
+            border: 1px solid var(--light-brown);
+        }
+
+        .section-subtitle {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.5rem;
+            color: var(--deep-brown);
+            margin-bottom: 1.5rem;
+            font-weight: 400;
+        }
+
+        .video-featured img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .video-title {
+            font-weight: 500;
+            color: var(--deep-brown);
+            margin-bottom: 0.5rem;
+        }
+
+        .video-description {
+            color: var(--warm-brown);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* 时间轴样式 */
+        .timeline-items {
+            position: relative;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            align-items: flex-start;
+        }
+
+        .timeline-date {
+            background: var(--accent-pink);
+            color: var(--deep-brown);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            white-space: nowrap;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .timeline-content {
+            flex: 1;
+            background: var(--soft-beige);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border-left: 4px solid var(--accent-pink);
+        }
+
+        .timeline-title {
+            font-weight: 500;
+            color: var(--deep-brown);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-desc {
+            color: var(--warm-brown);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* 按钮样式 */
+        .explore-btn {
+            background: linear-gradient(45deg, var(--accent-pink), var(--light-brown));
+            border: none;
+            color: var(--deep-brown);
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1.5rem;
+        }
+
+        .explore-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--warm-shadow);
+            color: var(--deep-brown);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .hero-section {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                text-align: center;
+            }
+
+            .hero-text {
+                padding-right: 0;
+            }
+
+            .bottom-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 2rem 1rem 4rem;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .photos-magazine {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: repeat(4, 150px);
+            }
+
+            .photo-large {
+                grid-column: span 2;
+                grid-row: span 2;
+            }
+
+            .video-section,
+            .timeline-section {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .photos-magazine {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(6, 150px);
+            }
+
+            .photo-large {
+                grid-column: span 1;
+                grid-row: span 2;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">生活札记</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">照片</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">视频</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">人生轨迹</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <div class="main-container">
+        <!-- 头部区域 -->
+        <section class="hero-section">
+            <div class="hero-text">
+                <h1 class="hero-title">记录美好<br>分享温暖</h1>
+                <p class="hero-subtitle">生活是一本书，每一页都值得用心书写。在这里，我将生活中的点点滴滴汇聚成温暖的回忆，与你分享那些珍贵的时光。</p>
+                <div class="hero-quote">
+                    "最美好的时光，往往藏在最平凡的日子里。"
+                </div>
+                <a href="#" class="explore-btn">开始探索</a>
+            </div>
+            <div class="hero-image">
+                <img src="https://picsum.photos/600/400?random=10" alt="主要展示图片">
+            </div>
+        </section>
+
+        <!-- 照片展示区域 -->
+        <section class="content-section">
+            <h2 class="section-title">精选时光</h2>
+            <div class="photos-magazine">
+                <div class="photo-large">
+                    <img src="https://picsum.photos/600/400?random=1" alt="精选照片1">
+                    <div class="photo-overlay">
+                        <h4>春天的第一缕阳光</h4>
+                        <p>温暖的午后时光，阳光透过窗棂洒在桌案上...</p>
+                    </div>
+                </div>
+                <div class="photo-medium">
+                    <img src="https://picsum.photos/300/200?random=2" alt="精选照片2">
+                    <div class="photo-overlay">
+                        <h5>城市印象</h5>
+                    </div>
+                </div>
+                <div class="photo-medium">
+                    <img src="https://picsum.photos/300/200?random=3" alt="精选照片3">
+                    <div class="photo-overlay">
+                        <h5>自然之美</h5>
+                    </div>
+                </div>
+                <div class="photo-small">
+                    <img src="https://picsum.photos/200/200?random=4" alt="精选照片4">
+                </div>
+                <div class="photo-small">
+                    <img src="https://picsum.photos/200/200?random=5" alt="精选照片5">
+                </div>
+            </div>
+            <div class="text-center">
+                <a href="#" class="explore-btn">查看更多照片</a>
+            </div>
+        </section>
+
+        <!-- 底部内容区域 -->
+        <div class="bottom-content">
+            <!-- 视频区域 -->
+            <section class="video-section">
+                <h3 class="section-subtitle">推荐视频</h3>
+                <div class="video-featured">
+                    <img src="https://picsum.photos/400/200?random=6" alt="推荐视频封面">
+                    <h4 class="video-title">一段美好的旅程</h4>
+                    <p class="video-description">这是一次难忘的旅行，让我们一起回顾那些美好的瞬间，感受大自然的魅力和人文的温暖。</p>
+                    <a href="#" class="explore-btn">观看视频</a>
+                </div>
+            </section>
+
+            <!-- 时间轴区域 -->
+            <section class="timeline-section">
+                <h3 class="section-subtitle">重要时刻</h3>
+                <div class="timeline-items">
+                    <div class="timeline-item">
+                        <div class="timeline-date">2024.03</div>
+                        <div class="timeline-content">
+                            <h5 class="timeline-title">完成重要项目</h5>
+                            <p class="timeline-desc">经过几个月的努力，终于完成了这个对我来说很重要的项目。</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2024.01</div>
+                        <div class="timeline-content">
+                            <h5 class="timeline-title">独自旅行</h5>
+                            <p class="timeline-desc">第一次一个人的旅行，收获了很多意想不到的美好。</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2023.12</div>
+                        <div class="timeline-content">
+                            <h5 class="timeline-title">新的开始</h5>
+                            <p class="timeline-desc">开始了新的工作，迎来人生的新阶段。</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="#" class="explore-btn">查看完整轨迹</a>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

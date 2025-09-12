@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>個人網站 - 港台復古雜誌</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --vintage-cream: #faf7f0;
+            --warm-white: #fefcf8;
+            --tea-paper: #f5f1e8;
+            --vintage-gold: #d4af37;
+            --classic-red: #c8102e;
+            --deep-brown: #4a3728;
+            --charcoal: #2c2c2c;
+            --vintage-green: #4a6741;
+            --soft-shadow: 0 4px 20px rgba(74, 55, 40, 0.1);
+            --retro-shadow: 0 8px 32px rgba(74, 55, 40, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+            background: var(--vintage-cream);
+            color: var(--deep-brown);
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        /* 頁面邊框裝飾 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 8px solid var(--vintage-gold);
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* 導航欄 */
+        .navbar {
+            background: rgba(250, 247, 240, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 3px solid var(--vintage-gold);
+            padding: 1.5rem 0;
+            box-shadow: var(--soft-shadow);
+        }
+
+        .navbar-brand {
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--classic-red) !important;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .nav-link {
+            color: var(--deep-brown) !important;
+            font-weight: 500;
+            font-size: 1rem;
+            margin: 0 0.8rem;
+            padding: 0.5rem 1rem !important;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--classic-red);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover {
+            color: var(--classic-red) !important;
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .nav-link:hover::after {
+            width: 80%;
+        }
+
+        /* 主容器 */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1rem 4rem;
+            position: relative;
+        }
+
+        /* 裝飾性元素 */
+        .decorative-border {
+            border: 2px solid var(--vintage-gold);
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .decorative-border::before {
+            content: '◆';
+            position: absolute;
+            top: -8px;
+            left: 20px;
+            background: var(--vintage-cream);
+            padding: 0 10px;
+            color: var(--vintage-gold);
+            font-size: 0.8rem;
+        }
+
+        /* 頭版區域 */
+        .front-page {
+            background: var(--warm-white);
+            margin-bottom: 3rem;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .front-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--classic-red) 0%, var(--vintage-gold) 50%, var(--vintage-green) 100%);
+        }
+
+        .masthead {
+            text-align: center;
+            border-bottom: 2px solid var(--vintage-gold);
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .masthead-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--classic-red);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .masthead-subtitle {
+            font-size: 1.2rem;
+            color: var(--deep-brown);
+            font-weight: 500;
+            letter-spacing: 0.2em;
+        }
+
+        .masthead-date {
+            font-size: 0.9rem;
+            color: var(--charcoal);
+            margin-top: 1rem;
+            font-weight: 300;
+        }
+
+        /* 主要內容佈局 */
+        .magazine-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .main-story {
+            background: var(--warm-white);
+            padding: 2rem;
+            position: relative;
+        }
+
+        .story-category {
+            background: var(--classic-red);
+            color: white;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .story-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--charcoal);
+            line-height: 1.3;
+            margin-bottom: 1rem;
+        }
+
+        .story-lead {
+            font-size: 1.1rem;
+            color: var(--deep-brown);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .story-content {
+            font-size: 1rem;
+            color: var(--charcoal);
+            line-height: 1.8;
+            text-align: justify;
+        }
+
+        .story-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            margin: 1.5rem 0;
+            box-shadow: var(--soft-shadow);
+        }
+
+        /* 側邊欄 */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sidebar-section {
+            background: var(--tea-paper);
+            padding: 1.5rem;
+            border-left: 4px solid var(--vintage-gold);
+        }
+
+        .sidebar-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--classic-red);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .sidebar-item {
+            border-bottom: 1px dotted var(--vintage-gold);
+            padding: 1rem 0;
+        }
+
+        .sidebar-item:last-child {
+            border-bottom: none;
+        }
+
+        .sidebar-item h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--charcoal);
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-item p {
+            font-size: 0.9rem;
+            color: var(--deep-brown);
+            line-height: 1.5;
+        }
+
+        .sidebar-meta {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 0.5rem;
+        }
+
+        /* 三欄佈局 */
+        .three-column {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .column-section {
+            background: var(--warm-white);
+            padding: 1.5rem;
+            border-top: 3px solid var(--vintage-green);
+        }
+
+        .column-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--vintage-green);
+            margin-bottom: 1rem;
+            text-align: center;
+            border-bottom: 1px solid var(--vintage-green);
+            padding-bottom: 0.5rem;
+        }
+
+        .column-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            border: 2px solid var(--tea-paper);
+        }
+
+        /* 頁腳裝飾 */
+        .footer-decoration {
+            text-align: center;
+            padding: 2rem;
+            border-top: 3px double var(--vintage-gold);
+            margin-top: 3rem;
+        }
+
+        .footer-ornament {
+            font-size: 1.5rem;
+            color: var(--vintage-gold);
+            margin: 0 1rem;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 1024px) {
+            .magazine-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .main-story {
+                margin-bottom: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body::before {
+                border-width: 4px;
+            }
+
+            .main-container {
+                padding: 1rem 0.5rem 2rem;
+            }
+
+            .front-page {
+                padding: 2rem 1rem;
+            }
+
+            .masthead-title {
+                font-size: 2.5rem;
+            }
+
+            .three-column {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .story-title {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .masthead-title {
+                font-size: 2rem;
+            }
+
+            .story-title {
+                font-size: 1.5rem;
+            }
+
+            .front-page {
+                padding: 1.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 導航欄 -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">時光雜誌</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">首頁</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">相片集</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">影像記錄</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">人生軌跡</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要內容 -->
+    <div class="main-container">
+        <!-- 頭版區域 -->
+        <header class="front-page decorative-border">
+            <div class="masthead">
+                <h1 class="masthead-title">時光印記</h1>
+                <p class="masthead-subtitle">TIMELESS MOMENTS</p>
+                <div class="masthead-date">創刊於 2024 年 ◆ 第 001 期</div>
+            </div>
+            
+            <p style="text-align: center; font-size: 1.1rem; color: var(--deep-brown); line-height: 1.6;">
+                記錄生活的美好瞬間，收藏人生的珍貴回憶<br>
+                在這裡，每一個故事都值得被細細品味
+            </p>
+        </header>
+
+        <!-- 主要佈局 -->
+        <div class="magazine-layout">
+            <!-- 主故事 -->
+            <article class="main-story decorative-border">
+                <div class="story-category">封面故事</div>
+                <h2 class="story-title">生活的詩意時光</h2>
+                <p class="story-lead">在忙碌的都市生活中，我們總是匆匆忙忙地趕路，卻忘記了停下腳步，感受生活中那些微小而美好的瞬間。</p>
+                
+                <img src="https://picsum.photos/600/300?random=1" alt="封面故事配圖" class="story-image">
+                
+                <div class="story-content">
+                    <p>每一張照片都是時間的切片，每一段影像都是記憶的載體。透過鏡頭，我們將平凡的日常昇華為永恆的藝術。無論是清晨第一縷陽光透過窗棂�灑在桌案上的溫暖，還是夜晚街角那盞孤燈下的寧靜，都值得我們用心記錄。</p>
+                    <p>這個網站不只是一個展示平台，更是一個情感的容器，承載著我們對美好生活的嚮往與追求。讓我們一起在這個數位空間裡，分享那些觸動心弦的時光片段。</p>
+                </div>
+            </article>
+
+            <!-- 側邊欄 -->
+            <aside class="sidebar">
+                <section class="sidebar-section">
+                    <h3 class="sidebar-title">本期精選</h3>
+                    <div class="sidebar-item">
+                        <h4>春日遊記</h4>
+                        <p>記錄春天的第一次旅行，感受大自然的復甦與生機。</p>
+                        <div class="sidebar-meta">相片 15 張 • 2024.03.15</div>
+                    </div>
+                    <div class="sidebar-item">
+                        <h4>家庭時光</h4>
+                        <p>珍貴的家人聚會時光，溫馨而美好的回憶片段。</p>
+                        <div class="sidebar-meta">影片 3 部 • 2024.02.20</div>
+                    </div>
+                    <div class="sidebar-item">
+                        <h4>城市漫步</h4>
+                        <p>用腳步丈量這座城市，發現隱藏在角落的美麗風景。</p>
+                        <div class="sidebar-meta">相片 28 張 • 2024.01.10</div>
+                    </div>
+                </section>
+
+                <section class="sidebar-section">
+                    <h3 class="sidebar-title">讀者互動</h3>
+                    <div class="sidebar-item">
+                        <h4>留言精選</h4>
+                        <p>"你的照片總是能觸動我的心弦，讓我想起自己的美好回憶。"</p>
+                        <div class="sidebar-meta">來自讀者 小美</div>
+                    </div>
+                    <div class="sidebar-item">
+                        <h4>投稿邀請</h4>
+                        <p>歡迎分享您的生活故事，讓我們一起創造更多美好的內容。</p>
+                    </div>
+                </section>
+            </aside>
+        </div>
+
+        <!-- 三欄佈局 -->
+        <section class="three-column">
+            <div class="column-section">
+                <h3 class="column-title">相片專欄</h3>
+                <img src="https://picsum.photos/300/150?random=2" alt="相片專欄" class="column-image">
+                <p>透過鏡頭捕捉生活中的美好瞬間，每一張照片都述說著獨特的故事。從日常的小確幸到特殊的慶祝時刻，讓影像成為我們記憶的守護者。</p>
+            </div>
+            
+            <div class="column-section">
+                <h3 class="column-title">影像日誌</h3>
+                <img src="https://picsum.photos/300/150?random=3" alt="影像日誌" class="column-image">
+                <p>動態的記憶更能觸動人心，這裡收集了生活中的精彩影像片段。從歡聲笑語到寧靜時光，用影像記錄下那些值得珍藏的美好時刻。</p>
+            </div>
+            
+            <div class="column-section">
+                <h3 class="column-title">人生軌跡</h3>
+                <img src="https://picsum.photos/300/150?random=4" alt="人生軌跡" class="column-image">
+                <p>重要的時刻值得被銘記，在這條時間線上記錄著人生路上的重要里程碑。每一個節點都是成長的見證，每一步都是前進的足跡。</p>
+            </div>
+        </section>
+
+        <!-- 頁腳裝飾 -->
+        <footer class="footer-decoration">
+            <span class="footer-ornament">◆</span>
+            <span style="color: var(--deep-brown); font-family: 'Noto Serif TC', serif;">時光印記雜誌</span>
+            <span class="footer-ornament">◆</span>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

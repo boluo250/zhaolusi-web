@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人网站 - 优雅网格式</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pure-white: #ffffff;
+            --snow-white: #fafafa;
+            --light-gray: #f5f5f5;
+            --border-gray: #e5e5e5;
+            --text-gray: #666666;
+            --dark-gray: #333333;
+            --accent-blue: #e8f4fd;
+            --accent-color: #4a90e2;
+            --subtle-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            --hover-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --focus-shadow: 0 8px 25px rgba(74, 144, 226, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--pure-white);
+            color: var(--dark-gray);
+            line-height: 1.6;
+            font-weight: 400;
+            font-size: 15px;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            background-color: rgba(255,255,255,0.98) !important;
+            backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 1px solid var(--border-gray);
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--dark-gray) !important;
+            letter-spacing: -0.01em;
+        }
+
+        .nav-link {
+            color: var(--text-gray) !important;
+            font-weight: 400;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem !important;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            margin: 0 0.2rem;
+        }
+
+        .nav-link:hover {
+            color: var(--dark-gray) !important;
+            background-color: var(--light-gray);
+        }
+
+        /* 主容器 */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem 6rem;
+        }
+
+        /* 头部介绍 */
+        .intro-section {
+            text-align: center;
+            margin-bottom: 5rem;
+            padding: 3rem 0;
+        }
+
+        .intro-title {
+            font-size: 2.75rem;
+            font-weight: 600;
+            color: var(--dark-gray);
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .intro-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-gray);
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.7;
+        }
+
+        .intro-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+            margin-top: 0.25rem;
+        }
+
+        /* 网格布局 */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .grid-item {
+            background: var(--pure-white);
+            border: 1px solid var(--border-gray);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .grid-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--hover-shadow);
+            border-color: var(--accent-color);
+        }
+
+        .grid-item:active {
+            transform: translateY(-2px);
+        }
+
+        /* 不同尺寸的网格项 */
+        .grid-large {
+            grid-column: span 8;
+            grid-row: span 2;
+        }
+
+        .grid-medium {
+            grid-column: span 4;
+        }
+
+        .grid-small {
+            grid-column: span 4;
+        }
+
+        .grid-wide {
+            grid-column: span 6;
+        }
+
+        .grid-tall {
+            grid-row: span 2;
+        }
+
+        /* 内容样式 */
+        .grid-content {
+            padding: 2rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .grid-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark-gray);
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.01em;
+        }
+
+        .grid-description {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .grid-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+            font-size: 0.8rem;
+            color: var(--text-gray);
+        }
+
+        .grid-count {
+            background: var(--light-gray);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .grid-arrow {
+            width: 20px;
+            height: 20px;
+            opacity: 0.6;
+            transition: all 0.2s ease;
+        }
+
+        .grid-item:hover .grid-arrow {
+            opacity: 1;
+            transform: translateX(2px);
+        }
+
+        /* 图片网格 */
+        .image-grid {
+            position: relative;
+            background: var(--light-gray);
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .grid-large .image-grid {
+            height: 300px;
+        }
+
+        .image-grid img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .grid-item:hover .image-grid img {
+            transform: scale(1.05);
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.8), rgba(74, 144, 226, 0.4));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+        }
+
+        .grid-item:hover .image-overlay {
+            opacity: 1;
+        }
+
+        /* 特殊网格样式 */
+        .grid-featured {
+            background: linear-gradient(135deg, var(--accent-blue), var(--pure-white));
+            border-color: var(--accent-color);
+        }
+
+        .grid-featured .grid-title {
+            color: var(--accent-color);
+        }
+
+        .grid-minimal {
+            border: none;
+            background: var(--snow-white);
+        }
+
+        .grid-minimal:hover {
+            background: var(--pure-white);
+            box-shadow: var(--focus-shadow);
+        }
+
+        /* 操作按钮 */
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--dark-gray);
+            color: white;
+            border: none;
+            padding: 0.625rem 1.25rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .action-btn-outline {
+            background: transparent;
+            color: var(--dark-gray);
+            border: 1px solid var(--border-gray);
+        }
+
+        .action-btn-outline:hover {
+            background: var(--dark-gray);
+            color: white;
+            border-color: var(--dark-gray);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .grid-container {
+                grid-template-columns: repeat(8, 1fr);
+            }
+            
+            .grid-large {
+                grid-column: span 8;
+            }
+            
+            .grid-medium,
+            .grid-small,
+            .grid-wide {
+                grid-column: span 4;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 2rem 1rem 4rem;
+            }
+
+            .intro-title {
+                font-size: 2.25rem;
+            }
+
+            .intro-stats {
+                gap: 2rem;
+            }
+
+            .grid-container {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1rem;
+            }
+
+            .grid-large,
+            .grid-medium,
+            .grid-small,
+            .grid-wide {
+                grid-column: span 4;
+            }
+
+            .grid-content {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .intro-title {
+                font-size: 1.875rem;
+            }
+
+            .intro-stats {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .grid-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .grid-large,
+            .grid-medium,
+            .grid-small,
+            .grid-wide {
+                grid-column: span 1;
+            }
+
+            .grid-content {
+                padding: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">个人空间</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">照片</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">视频</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">轨迹</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <div class="main-container">
+        <!-- 介绍区域 -->
+        <section class="intro-section">
+            <h1 class="intro-title">探索生活的美好</h1>
+            <p class="intro-subtitle">在这个数字空间里，我收集并分享生活中的精彩瞬间。每一张照片、每一段视频、每一个重要时刻，都是构成人生故事的珍贵片段。</p>
+            
+            <div class="intro-stats">
+                <div class="stat-item">
+                    <span class="stat-number">127</span>
+                    <div class="stat-label">精选照片</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">23</span>
+                    <div class="stat-label">视频记录</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">45</span>
+                    <div class="stat-label">重要时刻</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 网格内容 -->
+        <div class="grid-container">
+            <!-- 主要照片展示 -->
+            <div class="grid-item grid-large grid-featured">
+                <div class="image-grid">
+                    <img src="https://picsum.photos/800/400?random=1" alt="精选照片">
+                    <div class="image-overlay">浏览照片集</div>
+                </div>
+                <div class="grid-content">
+                    <h3 class="grid-title">照片时光</h3>
+                    <p class="grid-description">记录生活中的美好瞬间，从日常的点滴到特殊的庆典，每一张照片都承载着独特的回忆与情感。</p>
+                    <div class="grid-meta">
+                        <span class="grid-count">127 张照片</span>
+                        <svg class="grid-arrow" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 视频展示 -->
+            <div class="grid-item grid-medium">
+                <div class="image-grid">
+                    <img src="https://picsum.photos/400/200?random=2" alt="推荐视频">
+                    <div class="image-overlay">观看视频</div>
+                </div>
+                <div class="grid-content">
+                    <h3 class="grid-title">视频记录</h3>
+                    <p class="grid-description">动态的回忆更能触动心弦，这里收集了生活中的精彩视频片段。</p>
+                    <div class="grid-meta">
+                        <span class="grid-count">23 个视频</span>
+                        <svg class="grid-arrow" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 人生轨迹 -->
+            <div class="grid-item grid-wide grid-minimal">
+                <div class="grid-content">
+                    <h3 class="grid-title">人生轨迹</h3>
+                    <p class="grid-description">重要的时刻值得被铭记。在这条时间线上，记录着人生路上的关键节点和成长足迹。</p>
+                    
+                    <div style="margin: 1.5rem 0;">
+                        <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                            <div style="width: 8px; height: 8px; background: var(--accent-color); border-radius: 50%; margin-right: 1rem;"></div>
+                            <div>
+                                <div style="font-weight: 500; font-size: 0.9rem;">完成重要项目</div>
+                                <div style="font-size: 0.8rem; color: var(--text-gray);">2024年3月</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                            <div style="width: 8px; height: 8px; background: var(--text-gray); border-radius: 50%; margin-right: 1rem;"></div>
+                            <div>
+                                <div style="font-weight: 500; font-size: 0.9rem;">独自旅行体验</div>
+                                <div style="font-size: 0.8rem; color: var(--text-gray);">2024年1月</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <div style="width: 8px; height: 8px; background: var(--text-gray); border-radius: 50%; margin-right: 1rem;"></div>
+                            <div>
+                                <div style="font-weight: 500; font-size: 0.9rem;">新工作开始</div>
+                                <div style="font-size: 0.8rem; color: var(--text-gray);">2023年12月</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-meta">
+                        <span class="grid-count">45 个里程碑</span>
+                        <svg class="grid-arrow" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 最新动态 -->
+            <div class="grid-item grid-wide">
+                <div class="grid-content">
+                    <h3 class="grid-title">最新动态</h3>
+                    <p class="grid-description">保持更新，分享最近的生活片段和思考感悟。</p>
+                    
+                    <div style="margin: 1.5rem 0;">
+                        <div style="padding: 1rem; background: var(--light-gray); border-radius: 8px; margin-bottom: 1rem;">
+                            <div style="font-size: 0.9rem; margin-bottom: 0.5rem;">刚完成了一个有趣的项目，学到了很多新技能。</div>
+                            <div style="font-size: 0.8rem; color: var(--text-gray);">2天前</div>
+                        </div>
+                        <div style="padding: 1rem; background: var(--light-gray); border-radius: 8px; margin-bottom: 1rem;">
+                            <div style="font-size: 0.9rem; margin-bottom: 0.5rem;">春天的阳光真好，适合出去走走。</div>
+                            <div style="font-size: 0.8rem; color: var(--text-gray);">1周前</div>
+                        </div>
+                    </div>
+
+                    <a href="#" class="action-btn-outline">查看所有动态</a>
+                </div>
+            </div>
+
+            <!-- 联系方式 -->
+            <div class="grid-item grid-small">
+                <div class="grid-content">
+                    <h3 class="grid-title">保持联系</h3>
+                    <p class="grid-description">欢迎与我交流，分享你的想法和建议。</p>
+                    <a href="#" class="action-btn">联系我</a>
+                </div>
+            </div>
+
+            <!-- 关于我 -->
+            <div class="grid-item grid-small">
+                <div class="grid-content">
+                    <h3 class="grid-title">关于我</h3>
+                    <p class="grid-description">了解更多关于我的信息和人生理念。</p>
+                    <a href="#" class="action-btn-outline">了解更多</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

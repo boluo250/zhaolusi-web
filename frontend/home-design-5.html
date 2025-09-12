@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>個人網站 - 港台時尚雜誌</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;300;400;500;700;900&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pearl-white: #fefefe;
+            --silk-white: #faf9f7;
+            --champagne: #f7f3e9;
+            --rose-gold: #e8b4a0;
+            --soft-pink: #f4e4e0;
+            --deep-navy: #1a1a2e;
+            --charcoal-gray: #16213e;
+            --elegant-gray: #6c7b7f;
+            --accent-coral: #ff6b6b;
+            --luxury-shadow: 0 10px 40px rgba(26, 26, 46, 0.1);
+            --glamour-shadow: 0 20px 60px rgba(26, 26, 46, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+            background: var(--pearl-white);
+            color: var(--deep-navy);
+            line-height: 1.6;
+            font-weight: 300;
+            overflow-x: hidden;
+        }
+
+        /* 導航欄 */
+        .navbar {
+            background: rgba(254, 254, 254, 0.98) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(232, 180, 160, 0.3);
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--rose-gold), var(--accent-coral));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-link {
+            color: var(--deep-navy) !important;
+            font-weight: 400;
+            font-size: 0.95rem;
+            margin: 0 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -2px;
+            left: 0;
+            background: linear-gradient(90deg, var(--rose-gold), var(--accent-coral));
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-coral) !important;
+        }
+
+        .nav-link:hover::before {
+            width: 100%;
+        }
+
+        /* 主容器 */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* 英雄區域 */
+        .hero-section {
+            height: 100vh;
+            background: linear-gradient(135deg, var(--silk-white) 0%, var(--champagne) 100%);
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            padding: 0 3rem;
+            z-index: 2;
+            position: relative;
+        }
+
+        .hero-text {
+            padding-left: 2rem;
+        }
+
+        .hero-eyebrow {
+            font-size: 0.9rem;
+            color: var(--elegant-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 4.5rem;
+            font-weight: 900;
+            color: var(--deep-navy);
+            line-height: 0.9;
+            margin-bottom: 2rem;
+            letter-spacing: -0.03em;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--elegant-gray);
+            line-height: 1.5;
+            margin-bottom: 3rem;
+            font-weight: 300;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            background: linear-gradient(135deg, var(--rose-gold), var(--accent-coral));
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .hero-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--glamour-shadow);
+            color: white;
+        }
+
+        .hero-visual {
+            position: relative;
+            height: 600px;
+        }
+
+        .hero-image {
+            position: absolute;
+            border-radius: 20px;
+            box-shadow: var(--luxury-shadow);
+            object-fit: cover;
+        }
+
+        .hero-image:nth-child(1) {
+            top: 0;
+            left: 50px;
+            width: 300px;
+            height: 400px;
+            z-index: 3;
+        }
+
+        .hero-image:nth-child(2) {
+            top: 100px;
+            right: 0;
+            width: 250px;
+            height: 350px;
+            z-index: 2;
+        }
+
+        .hero-image:nth-child(3) {
+            bottom: 0;
+            left: 150px;
+            width: 200px;
+            height: 200px;
+            z-index: 1;
+        }
+
+        /* 裝飾性背景 */
+        .hero-decoration {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(45deg, rgba(232, 180, 160, 0.1), rgba(255, 107, 107, 0.1));
+            border-radius: 50%;
+            top: 10%;
+            right: 10%;
+            z-index: 1;
+        }
+
+        /* 內容區域 */
+        .content-section {
+            padding: 6rem 3rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-eyebrow {
+            font-size: 0.9rem;
+            color: var(--elegant-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--deep-navy);
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--elegant-gray);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* 特色展示區 */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .feature-card {
+            background: var(--silk-white);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--luxury-shadow);
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--glamour-shadow);
+        }
+
+        .feature-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .feature-card:hover .feature-image {
+            transform: scale(1.05);
+        }
+
+        .feature-content {
+            padding: 2rem;
+        }
+
+        .feature-category {
+            background: linear-gradient(135deg, var(--rose-gold), var(--accent-coral));
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--deep-navy);
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .feature-description {
+            color: var(--elegant-gray);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: var(--elegant-gray);
+        }
+
+        .feature-count {
+            background: var(--soft-pink);
+            color: var(--deep-navy);
+            padding: 0.3rem 0.8rem;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .feature-link {
+            color: var(--accent-coral);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-link:hover {
+            color: var(--rose-gold);
+            transform: translateX(5px);
+        }
+
+        /* 統計區域 */
+        .stats-section {
+            background: var(--deep-navy);
+            color: white;
+            padding: 4rem 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-decoration {
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(45deg, rgba(232, 180, 160, 0.1), rgba(255, 107, 107, 0.1));
+            border-radius: 50%;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-item {
+            padding: 2rem;
+        }
+
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--rose-gold);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.8);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 300;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 2rem;
+            }
+
+            .hero-text {
+                padding-left: 0;
+                order: 2;
+            }
+
+            .hero-visual {
+                order: 1;
+                height: 400px;
+            }
+
+            .hero-title {
+                font-size: 3.5rem;
+            }
+
+            .content-section {
+                padding: 4rem 2rem;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                height: auto;
+                padding: 4rem 0;
+            }
+
+            .hero-title {
+                font-size: 2.8rem;
+            }
+
+            .hero-visual {
+                height: 300px;
+            }
+
+            .hero-image:nth-child(1) {
+                width: 200px;
+                height: 280px;
+                left: 20px;
+            }
+
+            .hero-image:nth-child(2) {
+                width: 150px;
+                height: 200px;
+                right: 20px;
+            }
+
+            .hero-image:nth-child(3) {
+                width: 120px;
+                height: 120px;
+                left: 80px;
+            }
+
+            .content-section,
+            .stats-section {
+                padding: 3rem 1rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2.2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .feature-content {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 導航欄 -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">VOGUE</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Gallery</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Stories</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Timeline</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <!-- 英雄區域 -->
+        <section class="hero-section">
+            <div class="hero-decoration"></div>
+            <div class="hero-content">
+                <div class="hero-text">
+                    <div class="hero-eyebrow">Premium Lifestyle</div>
+                    <h1 class="hero-title">Capturing<br>Moments<br>in Style</h1>
+                    <p class="hero-subtitle">探索生活的無限可能，用鏡頭記錄最美好的瞬間。在這個充滿藝術氣息的空間裡，每一個故事都閃閃發光。</p>
+                    <a href="#content" class="hero-cta">
+                        <span>探索內容</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+                <div class="hero-visual">
+                    <img src="https://picsum.photos/300/400?random=1" alt="Fashion 1" class="hero-image">
+                    <img src="https://picsum.photos/250/350?random=2" alt="Fashion 2" class="hero-image">
+                    <img src="https://picsum.photos/200/200?random=3" alt="Fashion 3" class="hero-image">
+                </div>
+            </div>
+        </section>
+
+        <!-- 內容區域 -->
+        <section id="content" class="content-section">
+            <div class="section-header">
+                <div class="section-eyebrow">Featured Collections</div>
+                <h2 class="section-title">精選內容</h2>
+                <p class="section-subtitle">從時尚攝影到生活記錄，從藝術創作到人生感悟，這裡匯聚了最具品味的內容精選。</p>
+            </div>
+
+            <div class="features-grid">
+                <article class="feature-card">
+                    <img src="https://picsum.photos/400/250?random=4" alt="時尚攝影" class="feature-image">
+                    <div class="feature-content">
+                        <span class="feature-category">Fashion</span>
+                        <h3 class="feature-title">時尚攝影集</h3>
+                        <p class="feature-description">精心策劃的時尚攝影作品，展現服裝的藝術性與模特的優雅姿態，每一張照片都是視覺的盛宴。</p>
+                        <div class="feature-meta">
+                            <span class="feature-count">45 張作品</span>
+                            <a href="#" class="feature-link">
+                                查看作品
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="feature-card">
+                    <img src="https://picsum.photos/400/250?random=5" alt="生活美學" class="feature-image">
+                    <div class="feature-content">
+                        <span class="feature-category">Lifestyle</span>
+                        <h3 class="feature-title">生活美學</h3>
+                        <p class="feature-description">記錄日常生活中的美好時刻，從咖啡廳的午後時光到家居布置的精心設計，發現生活的藝術之美。</p>
+                        <div class="feature-meta">
+                            <span class="feature-count">67 個瞬間</span>
+                            <a href="#" class="feature-link">
+                                探索更多
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="feature-card">
+                    <img src="https://picsum.photos/400/250?random=6" alt="藝術創作" class="feature-image">
+                    <div class="feature-content">
+                        <span class="feature-category">Art</span>
+                        <h3 class="feature-title">藝術創作</h3>
+                        <p class="feature-description">個人藝術創作的展示空間，包括繪畫、攝影、設計等多元化的藝術表達形式。</p>
+                        <div class="feature-meta">
+                            <span class="feature-count">23 件作品</span>
+                            <a href="#" class="feature-link">
+                                欣賞作品
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- 統計區域 -->
+        <section class="stats-section">
+            <div class="stats-decoration"></div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">156</span>
+                    <div class="stat-label">精選照片</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">28</span>
+                    <div class="stat-label">影像故事</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">12</span>
+                    <div class="stat-label">藝術項目</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">5.2K</span>
+                    <div class="stat-label">瀏覽次數</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 平滑捲動效果
+        document.querySelector('.hero-cta').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector('#content').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        });
+    </script>
+</body>
+</html>

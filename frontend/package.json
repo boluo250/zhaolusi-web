@@ -1,0 +1,16 @@
+{
+  "name": "zhaolusi-web-frontend",
+  "version": "1.0.0",
+  "description": "Personal website frontend",
+  "main": "index.js",
+  "scripts": {
+    "dev": "live-server --port=3000 --cors",
+    "build": "echo 'Build completed'"
+  },
+  "dependencies": {
+    "axios": "^1.0.0"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

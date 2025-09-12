@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>個人網站 - 港台文藝雜誌</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500&family=Liu+Jian+Mao+Cao&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rice-paper: #faf8f1;
+            --tea-cream: #f7f4ea;
+            --bamboo-white: #f2f0e5;
+            --ink-wash: #e8e3d3;
+            --calligraphy-black: #2a2a2a;
+            --charcoal-gray: #4a4a4a;
+            --sage-green: #8faa96;
+            --tea-brown: #8b7355;
+            --ancient-gold: #d4af37;
+            --zen-blue: #6b8cae;
+            --soft-shadow: 0 4px 20px rgba(42, 42, 42, 0.08);
+            --literary-shadow: 0 8px 30px rgba(42, 42, 42, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Serif TC', 'Microsoft JhengHei', serif;
+            background: var(--rice-paper);
+            color: var(--calligraphy-black);
+            line-height: 1.8;
+            font-weight: 400;
+            position: relative;
+        }
+
+        /* 書法風格背景裝飾 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(143, 170, 150, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(107, 140, 174, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* 導航欄 */
+        .navbar {
+            background: rgba(250, 248, 241, 0.95) !important;
+            backdrop-filter: blur(15px);
+            border-bottom: 2px solid var(--ink-wash);
+            padding: 1.5rem 0;
+            box-shadow: var(--soft-shadow);
+        }
+
+        .navbar-brand {
+            font-family: 'Liu Jian Mao Cao', 'Noto Serif TC', serif;
+            font-weight: 400;
+            font-size: 2.2rem;
+            color: var(--tea-brown) !important;
+            writing-mode: horizontal-tb;
+            position: relative;
+        }
+
+        .navbar-brand::after {
+            content: '文藝';
+            font-size: 0.6em;
+            position: absolute;
+            bottom: -8px;
+            right: -20px;
+            color: var(--sage-green);
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 300;
+        }
+
+        .nav-link {
+            color: var(--charcoal-gray) !important;
+            font-weight: 400;
+            font-size: 1rem;
+            margin: 0 1rem;
+            padding: 0.5rem 0 !important;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--sage-green), var(--zen-blue));
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--tea-brown) !important;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* 主容器 */
+        .main-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* 標題頁面 */
+        .title-section {
+            padding: 6rem 0 4rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .magazine-header {
+            margin-bottom: 3rem;
+        }
+
+        .magazine-issue {
+            font-size: 0.9rem;
+            color: var(--charcoal-gray);
+            letter-spacing: 0.2em;
+            margin-bottom: 1rem;
+            font-weight: 300;
+        }
+
+        .magazine-title {
+            font-family: 'Liu Jian Mao Cao', 'Noto Serif TC', serif;
+            font-size: 4rem;
+            font-weight: 400;
+            color: var(--tea-brown);
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .magazine-subtitle {
+            font-size: 1.2rem;
+            color: var(--charcoal-gray);
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            margin-bottom: 2rem;
+        }
+
+        .magazine-quote {
+            font-size: 1.1rem;
+            color: var(--zen-blue);
+            font-style: italic;
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            line-height: 1.7;
+            position: relative;
+        }
+
+        .magazine-quote::before,
+        .magazine-quote::after {
+            content: '"';
+            font-size: 2rem;
+            color: var(--sage-green);
+            font-family: 'Noto Serif TC', serif;
+        }
+
+        .magazine-quote::before {
+            margin-right: 0.5rem;
+        }
+
+        .magazine-quote::after {
+            margin-left: 0.5rem;
+        }
+
+        /* 文章佈局 */
+        .article-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 3rem;
+            margin-bottom: 4rem;
+        }
+
+        .main-article {
+            background: var(--tea-cream);
+            padding: 3rem;
+            border-radius: 0;
+            box-shadow: var(--soft-shadow);
+            position: relative;
+        }
+
+        .main-article::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--sage-green), var(--zen-blue), var(--ancient-gold));
+        }
+
+        .article-category {
+            display: inline-block;
+            background: var(--sage-green);
+            color: white;
+            padding: 0.4rem 1.2rem;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.05em;
+            border-radius: 0;
+        }
+
+        .article-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--calligraphy-black);
+            margin-bottom: 1.5rem;
+            line-height: 1.3;
+        }
+
+        .article-meta {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            color: var(--charcoal-gray);
+        }
+
+        .article-lead {
+            font-size: 1.2rem;
+            color: var(--tea-brown);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            font-weight: 500;
+            border-left: 3px solid var(--sage-green);
+            padding-left: 1.5rem;
+        }
+
+        .article-content {
+            font-size: 1.05rem;
+            line-height: 1.9;
+            color: var(--calligraphy-black);
+            text-align: justify;
+        }
+
+        .article-content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .article-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            margin: 2rem 0;
+            border: 1px solid var(--ink-wash);
+        }
+
+        /* 側邊欄 */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .sidebar-section {
+            background: var(--bamboo-white);
+            padding: 2rem;
+            border: 1px solid var(--ink-wash);
+            position: relative;
+        }
+
+        .sidebar-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--zen-blue);
+        }
+
+        .sidebar-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--tea-brown);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--ink-wash);
+        }
+
+        .sidebar-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px dotted var(--ink-wash);
+        }
+
+        .sidebar-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .sidebar-item h4 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--calligraphy-black);
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .sidebar-item p {
+            font-size: 0.9rem;
+            color: var(--charcoal-gray);
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-meta {
+            font-size: 0.8rem;
+            color: var(--zen-blue);
+        }
+
+        /* 特色內容區 */
+        .featured-section {
+            background: var(--tea-cream);
+            padding: 4rem 3rem;
+            margin: 4rem 0;
+            position: relative;
+        }
+
+        .featured-section::before {
+            content: '◆';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--rice-paper);
+            color: var(--ancient-gold);
+            padding: 0 1rem;
+            font-size: 1.2rem;
+        }
+
+        .featured-title {
+            text-align: center;
+            font-family: 'Noto Serif TC', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--tea-brown);
+            margin-bottom: 3rem;
+        }
+
+        .featured-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .featured-card {
+            background: var(--rice-paper);
+            border: 1px solid var(--ink-wash);
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .featured-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--sage-green);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .featured-card:hover {
+            box-shadow: var(--literary-shadow);
+            transform: translateY(-2px);
+        }
+
+        .featured-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .featured-card h3 {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--calligraphy-black);
+            margin-bottom: 1rem;
+        }
+
+        .featured-card p {
+            color: var(--charcoal-gray);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .featured-link {
+            color: var(--zen-blue);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .featured-link:hover {
+            color: var(--tea-brown);
+            transform: translateX(3px);
+        }
+
+        /* 底部裝飾 */
+        .footer-section {
+            text-align: center;
+            padding: 3rem 0;
+            border-top: 2px double var(--ink-wash);
+            margin-top: 4rem;
+        }
+
+        .footer-ornament {
+            font-size: 1.5rem;
+            color: var(--ancient-gold);
+            margin: 0 1rem;
+        }
+
+        .footer-text {
+            font-family: 'Noto Serif TC', serif;
+            color: var(--charcoal-gray);
+            margin: 1rem 0;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 1024px) {
+            .article-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .main-article {
+                margin-bottom: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 0 1rem;
+            }
+
+            .title-section {
+                padding: 4rem 0 3rem;
+            }
+
+            .magazine-title {
+                font-size: 3rem;
+            }
+
+            .main-article,
+            .featured-section {
+                padding: 2rem;
+            }
+
+            .article-title {
+                font-size: 2rem;
+            }
+
+            .featured-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .magazine-title {
+                font-size: 2.5rem;
+            }
+
+            .article-title {
+                font-size: 1.7rem;
+            }
+
+            .main-article,
+            .sidebar-section,
+            .featured-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 導航欄 -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">雅集</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">首頁</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">影像集</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">文字記</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">歲月痕</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要內容 -->
+    <div class="main-container">
+        <!-- 標題區域 -->
+        <section class="title-section">
+            <div class="magazine-header">
+                <div class="magazine-issue">文藝雜誌 • 創刊號 • 二零二四年春</div>
+                <h1 class="magazine-title">歲月如歌</h1>
+                <p class="magazine-subtitle">SONGS OF TIME</p>
+                <div class="magazine-quote">
+                    時光荏苒，歲月如歌。在這個快速變遷的時代裡，我們用文字與影像，記錄下生命中最珍貴的瞬間。
+                </div>
+            </div>
+        </section>
+
+        <!-- 文章佈局 -->
+        <div class="article-grid">
+            <!-- 主文章 -->
+            <article class="main-article">
+                <span class="article-category">封面專題</span>
+                <h2 class="article-title">時光的溫柔詩篇</h2>
+                <div class="article-meta">
+                    <span>撰文：編輯部</span>
+                    <span>攝影：生活工作室</span>
+                    <span>發布：2024年3月</span>
+                </div>
+                <p class="article-lead">
+                    在這個喧囂的世界裡，我們總是匆忙地趕路，卻忘記了停下來感受生活的美好。每一個平凡的日子，都蘊含著不平凡的故事。
+                </p>
+                
+                <img src="https://picsum.photos/800/300?random=1" alt="封面配圖" class="article-image">
+                
+                <div class="article-content">
+                    <p>午後的陽光透過百葉窗，在桌案上投下斑駁的光影。一杯香茶，一本好書，時光在這一刻變得格外溫柔。這就是生活的詩意，不需要刻意尋找，它就在我們身邊的每一個角落。</p>
+                    
+                    <p>攝影不僅僅是按下快門的瞬間，更是對生活的深度觀察與感悟。每一張照片背後，都有著屬於它的故事。有些是關於成長的，有些是關於愛情的，有些是關於友誼的，有些則是關於孤獨的美麗。</p>
+                    
+                    <p>在這個個人網站裡，我將與您分享這些珍貴的時光片段。從城市的繁華到鄉村的寧靜，從春天的生機勃勃到冬日的靜謐安詳，每一個季節都有它獨特的韻味。</p>
+                    
+                    <p>讓我們一起慢下來，用心感受這個世界的美好。因為最美的風景，往往就在我們最不經意的時候出現。</p>
+                </div>
+            </article>
+
+            <!-- 側邊欄 -->
+            <aside class="sidebar">
+                <section class="sidebar-section">
+                    <h3 class="sidebar-title">本期推薦</h3>
+                    <div class="sidebar-item">
+                        <h4>春日印象</h4>
+                        <p>記錄春天的美好時光，從梅花的綻放到櫻花的飄落，每一個瞬間都值得珍藏。</p>
+                        <div class="sidebar-meta">攝影作品 • 25張</div>
+                    </div>
+                    <div class="sidebar-item">
+                        <h4>都市漫遊</h4>
+                        <p>在熙攘的城市中尋找寧靜的角落，發現那些被遺忘的美麗風景。</p>
+                        <div class="sidebar-meta">影像日記 • 8部</div>
+                    </div>
+                    <div class="sidebar-item">
+                        <h4>人生軌跡</h4>
+                        <p>記錄生命中的重要時刻，每一個里程碑都是成長的見證。</p>
+                        <div class="sidebar-meta">時間軸 • 持續更新</div>
+                    </div>
+                </section>
+
+                <section class="sidebar-section">
+                    <h3 class="sidebar-title">創作札記</h3>
+                    <div class="sidebar-item">
+                        <h4>關於攝影</h4>
+                        <p>"攝影是心靈的語言，每一次按下快門都是一次情感的表達。"</p>
+                    </div>
+                    <div class="sidebar-item">
+                        <h4>生活感悟</h4>
+                        <p>在平凡的日子裡發現不平凡的美好，這就是生活給我們最珍貴的禮物。</p>
+                    </div>
+                </section>
+            </aside>
+        </div>
+
+        <!-- 特色內容區 -->
+        <section class="featured-section">
+            <h2 class="featured-title">精選內容</h2>
+            <div class="featured-grid">
+                <div class="featured-card">
+                    <h3>攝影作品集</h3>
+                    <p>用鏡頭記錄生活的美好瞬間，從日常的小確幸到特殊的紀念時刻，每一張照片都承載著珍貴的回憶。</p>
+                    <a href="#" class="featured-link">
+                        瀏覽作品
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <div class="featured-card">
+                    <h3>影像故事</h3>
+                    <p>動態的記憶更能觸動心弦，這裡收集了生活中的精彩影像片段，每一段影片都述說著獨特的故事。</p>
+                    <a href="#" class="featured-link">
+                        觀看影片
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <div class="featured-card">
+                    <h3>時光軌跡</h3>
+                    <p>人生如歌，歲月如詩。在這條時間線上記錄著重要的人生節點，見證著成長的每一個足跡。</p>
+                    <a href="#" class="featured-link">
+                        回顧歷程
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 底部裝飾 -->
+        <footer class="footer-section">
+            <span class="footer-ornament">◆</span>
+            <div class="footer-text">歲月如歌文藝雜誌 • 用心記錄生活之美</div>
+            <span class="footer-ornament">◆</span>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
