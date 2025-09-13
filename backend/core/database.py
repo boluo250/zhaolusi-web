@@ -6,7 +6,7 @@ from typing import Optional
 
 class Settings(BaseSettings):
     database_url: str = "sqlite:///./zhaolusi.db"
-    media_root: str = "./media"
+    media_root: str = "../media"
     media_url: str = "/media/"
     
     class Config:

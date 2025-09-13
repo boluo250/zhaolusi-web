@@ -32,13 +32,13 @@ function showPage(pageName) {
 async function loadRandomHeroImage() {
     try {
         const response = await axios.get(`${API_BASE_URL}/gallery/random-hero`);
-        const heroImg = document.querySelector('.hero-image img');
+        const heroImg = document.querySelector('#hero-image');
         if (heroImg && response.data.image_url) {
-            // 构建完整的URL，使用后端服务器地址
-            const baseUrl = API_BASE_URL.replace('/api', '');  // http://127.0.0.1:8001
-            const imageUrl = baseUrl + response.data.image_url;
+            // 构建完整的图片URL
+            const imageUrl = `${API_BASE_URL.replace('/api', '')}${response.data.image_url}`;
             heroImg.src = imageUrl;
             heroImg.alt = "随机展示图片";
+            console.log('Hero image loaded:', imageUrl);
         }
     } catch (error) {
         console.error('Error loading random hero image:', error);
