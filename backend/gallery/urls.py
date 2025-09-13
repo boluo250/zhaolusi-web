@@ -8,4 +8,5 @@ urlpatterns = [
     path('videos/<int:pk>/', views.VideoDetailAPIView.as_view(), name='video-detail'),
     path('featured/', views.featured_content, name='featured-content'),
     path('stats/', views.gallery_stats, name='gallery-stats'),
+    path('random-hero/', views.random_hero_image, name='random-hero-image'),
 ]

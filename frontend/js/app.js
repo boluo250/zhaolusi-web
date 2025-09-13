@@ -1,5 +1,5 @@
 // API 基础配置
-const API_BASE_URL = 'http://127.0.0.1:8000/api';
+const API_BASE_URL = 'http://127.0.0.1:8001/api';
 
 // 页面导航
 function showPage(pageName) {
@@ -28,12 +28,33 @@ function showPage(pageName) {
     }
 }
 
+// 加载随机hero图片
+async function loadRandomHeroImage() {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/gallery/random-hero/`);
+        const heroImg = document.querySelector('.hero-image img');
+        if (heroImg && response.data.image_url) {
+            // 构建完整的URL，使用后端服务器地址
+            const baseUrl = API_BASE_URL.replace('/api', '');  // http://127.0.0.1:8001
+            const imageUrl = baseUrl + response.data.image_url;
+            heroImg.src = imageUrl;
+            heroImg.alt = "随机展示图片";
+        }
+    } catch (error) {
+        console.error('Error loading random hero image:', error);
+        // 如果加载失败，保持原有的占位图片
+    }
+}
+
 // 加载首页数据
 async function loadHomepage() {
     try {
         showLoading('featured-photos');
         showLoading('featured-videos');
         showLoading('featured-events');
+        
+        // 加载随机hero图片
+        await loadRandomHeroImage();
         
         // 加载精选内容
         const featuredResponse = await axios.get(`${API_BASE_URL}/gallery/featured/`);

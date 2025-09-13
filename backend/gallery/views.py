@@ -2,6 +2,10 @@ from rest_framework import generics, filters
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django_filters.rest_framework import DjangoFilterBackend
+from django.conf import settings
+from django.http import JsonResponse
+import os
+import random
 from .models import Photo, Video
 from .serializers import PhotoSerializer, VideoSerializer
 
@@ -58,3 +62,25 @@ def gallery_stats(request):
         'photo_categories': photo_categories,
         'video_categories': video_categories,
     })
+
+
+@api_view(['GET'])
+def random_hero_image(request):
+    """Get a random image from media/pic directory for hero section"""
+    pic_dir = os.path.join(settings.MEDIA_ROOT, 'pic')
+    
+    try:
+        if os.path.exists(pic_dir):
+            image_files = [f for f in os.listdir(pic_dir) 
+                          if f.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp'))]
+            
+            if image_files:
+                random_image = random.choice(image_files)
+                image_url = f"{settings.MEDIA_URL}pic/{random_image}"
+                return JsonResponse({'image_url': image_url})
+            else:
+                return JsonResponse({'error': 'No images found'}, status=404)
+        else:
+            return JsonResponse({'error': 'Image directory not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
