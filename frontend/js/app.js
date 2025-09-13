@@ -31,7 +31,7 @@ function showPage(pageName) {
 // 加载随机hero图片
 async function loadRandomHeroImage() {
     try {
-        const response = await axios.get(`${API_BASE_URL}/gallery/random-hero/`);
+        const response = await axios.get(`${API_BASE_URL}/gallery/random-hero`);
         const heroImg = document.querySelector('.hero-image img');
         if (heroImg && response.data.image_url) {
             // 构建完整的URL，使用后端服务器地址
@@ -57,8 +57,8 @@ async function loadHomepage() {
         await loadRandomHeroImage();
         
         // 加载精选内容
-        const featuredResponse = await axios.get(`${API_BASE_URL}/gallery/featured/`);
-        const timelineResponse = await axios.get(`${API_BASE_URL}/timeline/featured/`);
+        const featuredResponse = await axios.get(`${API_BASE_URL}/gallery/featured`);
+        const timelineResponse = await axios.get(`${API_BASE_URL}/timeline/featured`);
         
         displayFeaturedPhotos(featuredResponse.data.photos.slice(0, 6));
         displayFeaturedVideos(featuredResponse.data.videos.slice(0, 3));
@@ -165,14 +165,15 @@ async function loadPhotos(page = 1, category = '') {
     try {
         showLoading('photos-grid');
         
-        let url = `${API_BASE_URL}/gallery/photos/?page=${page}`;
+        let url = `${API_BASE_URL}/gallery/photos?skip=${(page-1)*20}&limit=20`;
         if (category) {
             url += `&category=${category}`;
         }
         
         const response = await axios.get(url);
-        displayPhotos(response.data.results);
-        displayPagination(response.data, 'photos', loadPhotos);
+        displayPhotos(response.data);
+        // FastAPI返回的是直接的数组，没有分页信息暂时注释
+        // displayPagination(response.data, 'photos', loadPhotos);
         
     } catch (error) {
         console.error('Error loading photos:', error);
@@ -209,14 +210,15 @@ async function loadVideos(page = 1, category = '') {
     try {
         showLoading('videos-grid');
         
-        let url = `${API_BASE_URL}/gallery/videos/?page=${page}`;
+        let url = `${API_BASE_URL}/gallery/videos?skip=${(page-1)*20}&limit=20`;
         if (category) {
             url += `&category=${category}`;
         }
         
         const response = await axios.get(url);
-        displayVideos(response.data.results);
-        displayPagination(response.data, 'videos', loadVideos);
+        displayVideos(response.data);
+        // FastAPI返回的是直接的数组，没有分页信息暂时注释
+        // displayPagination(response.data, 'videos', loadVideos);
         
     } catch (error) {
         console.error('Error loading videos:', error);
@@ -258,13 +260,13 @@ async function loadTimeline(featured = '') {
     try {
         showLoading('timeline-events');
         
-        let url = `${API_BASE_URL}/timeline/events/`;
+        let url = `${API_BASE_URL}/timeline/events`;
         if (featured === 'featured') {
             url += '?is_featured=true';
         }
         
         const response = await axios.get(url);
-        displayTimeline(response.data.results);
+        displayTimeline(response.data);
         
     } catch (error) {
         console.error('Error loading timeline:', error);

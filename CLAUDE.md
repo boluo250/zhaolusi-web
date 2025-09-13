@@ -13,30 +13,37 @@
   🏗️ 项目结构
 
   zhaolusi-web/
-  ├── backend/                    # Django 后端
-  │   ├── personal_site/         # Django 配置
-  │   ├── gallery/               # 照片/视频应用
-  │   ├── timeline/              # 人生轨迹应用
-  │   ├── media/                 # 媒体文件存储
-  │   └── manage.py
+  ├── backend/                    # FastAPI 后端
+  │   ├── main.py                # FastAPI 应用入口
+  │   ├── requirements.txt       # Python 依赖
+  │   ├── core/
+  │   │   └── database.py        # 数据库配置
+  │   ├── models/
+  │   │   └── __init__.py        # SQLAlchemy 模型
+  │   ├── schemas/
+  │   │   └── __init__.py        # Pydantic schemas
+  │   └── routers/
+  │       ├── gallery.py         # 照片/视频 API
+  │       └── timeline.py        # 时间轴 API
   ├── frontend/                  # 前端
   │   ├── css/style.css         # 样式文件
   │   ├── js/app.js             # 核心功能
   │   ├── index.html            # 主页面
   │   └── package.json
-  ├── requirements.txt           # Python 依赖
+  ├── media/                    # 媒体文件存储
   └── venv/                     # 虚拟环境
 
   🎯 已实现功能
 
-  后端 (Django + DRF)
+  后端 (FastAPI + SQLAlchemy)
 
   - ✅ 照片模型：支持分类、描述、时间戳
   - ✅ 视频模型：支持本地上传 + 外部链接(B站/YouTube)
   - ✅ 时间轴模型：事件类型、日期、地点、重要标记
-  - ✅ 完整的 REST API 接口
-  - ✅ Django 管理后台
+  - ✅ 完整的 REST API 接口 + 自动文档生成
+  - ✅ SQLite 数据库 + SQLAlchemy ORM
   - ✅ 分页、筛选、搜索功能
+  - ✅ CORS 配置和静态文件服务
 
   前端功能
 
@@ -49,12 +56,15 @@
 
   🚀 如何启动
 
-  后端启动
+  后端启动 (FastAPI)
 
-  # 激活虚拟环境并启动 Django
+  # 激活虚拟环境并启动 FastAPI
   source venv/bin/activate
   cd backend
-  python manage.py runserver 0.0.0.0:8001
+  python main.py
+
+  # 或者使用 uvicorn 直接启动
+  uvicorn main:app --host 0.0.0.0 --port 8001 --reload
 
   前端启动
 
