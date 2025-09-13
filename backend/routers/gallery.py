@@ -155,6 +155,33 @@ def get_gallery_stats(db: Session = Depends(get_db)):
         video_categories=video_categories
     )
 
+# Wall photos for featured section
+@router.get("/wall-photos")
+def get_wall_photos():
+    wall_pic_dir = os.path.join(settings.media_root, 'wall-pic')
+    
+    try:
+        if os.path.exists(wall_pic_dir):
+            image_files = [f for f in os.listdir(wall_pic_dir) 
+                          if f.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp'))]
+            
+            if image_files:
+                # 随机打乱照片顺序
+                random.shuffle(image_files)
+                wall_photos = []
+                for image_file in image_files:
+                    wall_photos.append({
+                        "filename": image_file,
+                        "url": f"{settings.media_url}wall-pic/{image_file}"
+                    })
+                return {"photos": wall_photos}
+            else:
+                return {"photos": []}
+        else:
+            raise HTTPException(status_code=404, detail="Wall-pic directory not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Random hero image
 @router.get("/random-hero", response_model=RandomHeroResponse)
 def get_random_hero_image():

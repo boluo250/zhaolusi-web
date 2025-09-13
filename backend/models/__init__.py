@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, Date
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, Date, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 from datetime import datetime
@@ -42,3 +42,25 @@ class TimelineEvent(Base):
     is_featured = Column(Boolean, default=False)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+
+class Message(Base):
+    __tablename__ = "messages"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    nickname = Column(String(50), nullable=False)
+    content = Column(Text, nullable=False)
+    email = Column(String(100), default="")  # Optional for reply notification
+    ip_address = Column(String(45), nullable=False)  # For spam protection
+    status = Column(String(20), default="pending")  # pending, approved, rejected
+    spam_score = Column(Float, default=0.0)  # Auto spam detection score
+    created_at = Column(DateTime, default=func.now())
+    approved_at = Column(DateTime, nullable=True)
+    approved_by = Column(String(50), default="")
+
+class BannedWord(Base):
+    __tablename__ = "banned_words"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    word = Column(String(100), nullable=False)
+    severity = Column(String(10), default="medium")  # low, medium, high
+    created_at = Column(DateTime, default=func.now())

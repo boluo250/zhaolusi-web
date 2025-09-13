@@ -7,6 +7,7 @@ import random
 from core.database import engine
 from models import Base
 from routers import gallery_router, timeline_router
+from routers.messages import router as messages_router
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -27,7 +28,7 @@ app.add_middleware(
 )
 
 # Mount static files for media
-media_directory = "../media"
+media_directory = os.path.abspath("../media")
 if not os.path.exists(media_directory):
     os.makedirs(media_directory)
     
@@ -36,6 +37,7 @@ app.mount("/media", StaticFiles(directory=media_directory), name="media")
 # Include routers
 app.include_router(gallery_router, prefix="/api/gallery", tags=["gallery"])
 app.include_router(timeline_router, prefix="/api/timeline", tags=["timeline"])
+app.include_router(messages_router, prefix="/api", tags=["messages"])
 
 @app.get("/")
 def read_root():

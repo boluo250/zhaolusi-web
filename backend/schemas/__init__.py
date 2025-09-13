@@ -19,6 +19,11 @@ class EventTypeEnum(str, Enum):
     family = "family"
     other = "other"
 
+class MessageStatusEnum(str, Enum):
+    pending = "pending"
+    approved = "approved"
+    rejected = "rejected"
+
 # Photo schemas
 class PhotoBase(BaseModel):
     title: str = Field(..., max_length=200)
@@ -122,3 +127,38 @@ class TimelineStatsResponse(BaseModel):
 
 class RandomHeroResponse(BaseModel):
     image_url: str
+
+# Message schemas
+class MessageBase(BaseModel):
+    nickname: str = Field(..., min_length=1, max_length=50)
+    content: str = Field(..., min_length=1, max_length=2000)
+    email: Optional[str] = ""
+
+class MessageCreate(MessageBase):
+    pass
+
+class MessageResponse(BaseModel):
+    id: int
+    nickname: str
+    content: str
+    email: str
+    status: MessageStatusEnum
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+class MessageAdminResponse(MessageResponse):
+    ip_address: str
+    spam_score: float
+    approved_at: Optional[datetime]
+    approved_by: str
+
+class MessageUpdate(BaseModel):
+    status: MessageStatusEnum
+    approved_by: Optional[str] = None
+
+class MessageStatsResponse(BaseModel):
+    total_messages: int
+    pending_messages: int
+    approved_messages: int
