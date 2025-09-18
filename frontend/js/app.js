@@ -1,5 +1,5 @@
 // API 基础配置
-const API_BASE_URL = 'http://127.0.0.1:8001/api';
+const API_BASE_URL = 'http://localhost:8001/api';
 const MEDIA_BASE_URL = 'http://127.0.0.1:8001';
 
 // 页面导航
@@ -18,7 +18,10 @@ function showPage(pageName) {
             loadHomepage();
             break;
         case 'photos':
-            loadPhotos();
+            loadPhotoTimeline();
+            break;
+        case 'weibo':
+            loadWeiboTimeline();
             break;
         case 'videos':
             loadVideos();
@@ -510,6 +513,19 @@ function formatDate(dateString) {
     });
 }
 
+// 格式化照片日期，显示月-日格式
+function formatPhotoDate(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+        return dateString;
+    }
+    return date.toLocaleDateString('zh-CN', {
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
 function getCategoryName(category) {
     const categories = {
         'travel': '旅行',
@@ -675,10 +691,21 @@ function displayMessages(messages) {
                 <div class="message-date">${formatDateTime(message.created_at)}</div>
             </div>
             <div class="message-content">${escapeHtml(message.content)}</div>
+            <div class="message-actions">
+                <button class="like-btn" onclick="toggleLike(${message.id})" id="like-btn-${message.id}">
+                    <i class="fas fa-heart" id="like-icon-${message.id}"></i>
+                    <span id="like-count-${message.id}">${message.likes_count || 0}</span>
+                </button>
+            </div>
         </div>
     `).join('');
     
     container.innerHTML = html;
+    
+    // 检查每个留言的点赞状态
+    messages.forEach(message => {
+        checkLikeStatus(message.id);
+    });
 }
 
 // 提交留言
@@ -935,7 +962,401 @@ function truncateText(text, maxLength) {
     return text.substring(0, maxLength) + '...';
 }
 
-// ===== 留言墙设计方案切换 =====
+// ===== 照片时间轴功能 =====
+
+// 全局变量
+let currentSelectedYear = null;
+let currentYearsData = [];
+let currentTimelineData = {};
+
+// 微博相关的全局变量
+let currentWeiboSelectedYear = null;
+let currentWeiboYearsData = [];
+let currentWeiboTimelineData = {};
+
+// 加载照片时间轴页面
+async function loadPhotoTimeline() {
+    try {
+        await loadYearSelector();
+    } catch (error) {
+        console.error('Error loading photo timeline:', error);
+    }
+}
+
+// 加载年份选择器
+async function loadYearSelector() {
+    const yearSelectorContainer = document.getElementById('year-selector');
+    if (!yearSelectorContainer) return;
+    
+    try {
+        yearSelectorContainer.innerHTML = '<div class="year-selector-loading">加载年份中...</div>';
+        
+        const response = await axios.get(`${API_BASE_URL}/gallery/wall-photos/years`);
+        currentYearsData = response.data.years || [];
+        
+        if (currentYearsData.length === 0) {
+            yearSelectorContainer.innerHTML = '<div class="no-years">暂无照片年份</div>';
+            return;
+        }
+        
+        // 生成年份选择器
+        const yearSelectorHTML = currentYearsData.map(yearData => `
+            <button class="year-btn ${yearData.year === currentSelectedYear ? 'active' : ''}" 
+                    onclick="selectYear(${yearData.year})" 
+                    data-year="${yearData.year}">
+                ${yearData.year}
+                <span class="year-count">(${yearData.photo_count}张)</span>
+            </button>
+        `).join('');
+        
+        yearSelectorContainer.innerHTML = yearSelectorHTML;
+        
+        // 默认选择最新的年份
+        if (!currentSelectedYear && currentYearsData.length > 0) {
+            selectYear(currentYearsData[0].year);
+        }
+        
+    } catch (error) {
+        console.error('Error loading year selector:', error);
+        yearSelectorContainer.innerHTML = '<div class="year-selector-error">加载年份失败</div>';
+    }
+}
+
+// 选择年份
+async function selectYear(year) {
+    currentSelectedYear = year;
+    
+    // 更新年份选择器样式
+    document.querySelectorAll('.year-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (parseInt(btn.dataset.year) === year) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // 加载选中年份的照片
+    await loadTimelinePhotos(year);
+}
+
+// 加载时间轴照片
+async function loadTimelinePhotos(year) {
+    const timelineContainer = document.getElementById('photo-timeline');
+    if (!timelineContainer) return;
+    
+    try {
+        timelineContainer.innerHTML = '<div class="timeline-loading">加载照片中...</div>';
+        
+        const response = await axios.get(`${API_BASE_URL}/gallery/wall-photos/${year}`);
+        const data = response.data;
+        
+        if (!data.photos || data.photos.length === 0) {
+            timelineContainer.innerHTML = '<div class="timeline-empty">该年份暂无照片</div>';
+            return;
+        }
+        
+        currentTimelineData = data;
+        displayPhotoTimeline(data);
+        
+    } catch (error) {
+        console.error('Error loading timeline photos:', error);
+        timelineContainer.innerHTML = '<div class="timeline-error">加载照片失败</div>';
+    }
+}
+
+// 显示照片时间轴
+function displayPhotoTimeline(data) {
+    const timelineContainer = document.getElementById('photo-timeline');
+    if (!timelineContainer) return;
+    
+    const { photos_by_month, months, year } = data;
+    
+    if (!photos_by_month || !months || months.length === 0) {
+        timelineContainer.innerHTML = '<div class="timeline-empty">该年份暂无照片</div>';
+        return;
+    }
+    
+    // 生成时间轴HTML
+    const timelineHTML = `
+        <div class="timeline-container">
+            <div class="timeline-header">
+                <h2>${year}年的美好时光</h2>
+                <p class="timeline-subtitle">共 ${data.photos.length} 张照片，记录了 ${months.length} 个月的精彩瞬间</p>
+            </div>
+            <div class="timeline-content">
+                ${months.map(monthData => {
+                    const monthPhotos = photos_by_month[monthData.month] || [];
+                    return generateMonthSection(year, monthData.month, monthPhotos, monthData.photo_count);
+                }).join('')}
+            </div>
+        </div>
+    `;
+    
+    timelineContainer.innerHTML = timelineHTML;
+    
+    // 初始化月份展开/折叠功能
+    initializeMonthToggle();
+}
+
+// 生成月份区块
+function generateMonthSection(year, month, photos, photoCount) {
+    const monthNames = ['', '1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+    const monthName = monthNames[month];
+    
+    const photosHTML = photos.map((photo, index) => `
+        <div class="timeline-photo-item" onclick="openTimelinePhoto(${month}, ${index})">
+            <img src="${MEDIA_BASE_URL}${photo.url}" alt="${photo.filename}" loading="lazy">
+            <div class="photo-overlay">
+                <i class="fas fa-search-plus"></i>
+            </div>
+        </div>
+    `).join('');
+    
+    return `
+        <div class="month-section" data-month="${month}">
+            <div class="month-header" onclick="toggleMonth(${month})">
+                <div class="month-info">
+                    <h3 class="month-title">${year}年${monthName}</h3>
+                    <span class="month-count">${photoCount}张照片</span>
+                </div>
+                <div class="month-toggle">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="month-content expanded" data-month-content="${month}">
+                <div class="timeline-photos-grid">
+                    ${photosHTML}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// 初始化月份展开/折叠功能
+function initializeMonthToggle() {
+    // 默认所有月份都展开，可以根据需要修改
+}
+
+// 切换月份展开/折叠
+function toggleMonth(month) {
+    const monthContent = document.querySelector(`[data-month-content="${month}"]`);
+    const monthToggle = document.querySelector(`[data-month="${month}"] .month-toggle i`);
+    
+    if (!monthContent || !monthToggle) return;
+    
+    if (monthContent.classList.contains('expanded')) {
+        // 折叠
+        monthContent.classList.remove('expanded');
+        monthContent.classList.add('collapsed');
+        monthToggle.style.transform = 'rotate(-90deg)';
+    } else {
+        // 展开
+        monthContent.classList.remove('collapsed');
+        monthContent.classList.add('expanded');
+        monthToggle.style.transform = 'rotate(0deg)';
+    }
+}
+
+// 打开时间轴照片lightbox
+function openTimelinePhoto(month, photoIndex) {
+    if (!currentTimelineData.photos_by_month || !currentTimelineData.photos_by_month[month]) {
+        return;
+    }
+    
+    const monthPhotos = currentTimelineData.photos_by_month[month];
+    const photosWithFullUrl = monthPhotos.map(photo => ({
+        ...photo,
+        url: MEDIA_BASE_URL + photo.url
+    }));
+    
+    openLightbox(photosWithFullUrl, photoIndex);
+}
+
+// 月份名称工具函数
+function getMonthName(monthNumber) {
+    const monthNames = ['', '1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+    return monthNames[monthNumber] || `${monthNumber}月`;
+}
+
+// 微博时间轴功能
+async function loadWeiboTimeline() {
+    try {
+        await loadWeiboYearSelector();
+    } catch (error) {
+        console.error('Error loading weibo timeline:', error);
+    }
+}
+
+// 加载微博年份选择器
+async function loadWeiboYearSelector() {
+    const yearSelectorContainer = document.getElementById('weibo-year-selector');
+    if (!yearSelectorContainer) {
+        console.error('weibo-year-selector element not found');
+        return;
+    }
+    
+    try {
+        console.log('Loading weibo year selector...');
+        yearSelectorContainer.innerHTML = '<div class="year-selector-loading">加载年份中...</div>';
+        
+        const response = await axios.get(`${API_BASE_URL}/gallery/weibo-photos/years`);
+        console.log('Weibo years response:', response.data);
+        currentWeiboYearsData = response.data.years || [];
+        
+        if (currentWeiboYearsData.length === 0) {
+            yearSelectorContainer.innerHTML = '<div class="no-years">暂无微博照片年份</div>';
+            return;
+        }
+        
+        // 生成年份选择器
+        const yearSelectorHTML = currentWeiboYearsData.map(yearData => `
+            <button class="year-btn ${yearData.year === currentWeiboSelectedYear ? 'active' : ''}" 
+                    onclick="selectWeiboYear(${yearData.year})" 
+                    data-year="${yearData.year}">
+                ${yearData.year}
+                <span class="year-count">(${yearData.photo_count}张)</span>
+            </button>
+        `).join('');
+        
+        yearSelectorContainer.innerHTML = yearSelectorHTML;
+        
+        // 默认选择最新的年份
+        if (!currentWeiboSelectedYear && currentWeiboYearsData.length > 0) {
+            selectWeiboYear(currentWeiboYearsData[0].year);
+        }
+        
+    } catch (error) {
+        console.error('Error loading weibo year selector:', error);
+        yearSelectorContainer.innerHTML = '<div class="year-selector-error">加载年份失败: ' + error.message + '</div>';
+    }
+}
+
+// 选择微博年份
+async function selectWeiboYear(year) {
+    currentWeiboSelectedYear = year;
+    
+    // 更新年份选择器样式
+    document.querySelectorAll('#weibo-year-selector .year-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (parseInt(btn.dataset.year) === year) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // 加载选中年份的微博照片
+    await loadWeiboTimelinePhotos(year);
+}
+
+// 加载微博时间轴照片
+async function loadWeiboTimelinePhotos(year) {
+    const timelineContainer = document.getElementById('weibo-timeline');
+    if (!timelineContainer) {
+        console.error('weibo-timeline element not found');
+        return;
+    }
+    
+    try {
+        console.log('Loading weibo photos for year:', year);
+        timelineContainer.innerHTML = '<div class="timeline-loading">加载微博照片中...</div>';
+        
+        const response = await axios.get(`${API_BASE_URL}/gallery/weibo-photos/${year}`);
+        console.log('Weibo photos response:', response.data);
+        const data = response.data;
+        
+        if (!data.photos || data.photos.length === 0) {
+            timelineContainer.innerHTML = '<div class="timeline-empty">该年份暂无微博照片</div>';
+            return;
+        }
+        
+        currentWeiboTimelineData = data;
+        displayWeiboTimeline(data);
+        
+    } catch (error) {
+        console.error('Error loading weibo timeline photos:', error);
+        timelineContainer.innerHTML = '<div class="timeline-error">加载微博照片失败: ' + error.message + '</div>';
+    }
+}
+
+// 显示微博照片时间轴
+function displayWeiboTimeline(data) {
+    const timelineContainer = document.getElementById('weibo-timeline');
+    if (!timelineContainer) return;
+    
+    const { photos_by_month, months, year } = data;
+    
+    if (!photos_by_month || !months || months.length === 0) {
+        timelineContainer.innerHTML = '<div class="timeline-empty">该年份暂无微博照片</div>';
+        return;
+    }
+    
+    const timelineHTML = months.map(monthData => {
+        const monthPhotos = photos_by_month[monthData.month];
+        return generateWeiboMonthBlock(monthData.month, monthPhotos, year);
+    }).join('');
+    
+    timelineContainer.innerHTML = `
+        <div class="timeline-year-header">
+            <h2>${year}年 微博时光</h2>
+            <p class="timeline-stats">共 ${data.photos.length} 张微博照片</p>
+        </div>
+        <div class="timeline-content">
+            ${timelineHTML}
+        </div>
+    `;
+    
+    initializeMonthToggle();
+}
+
+// 生成微博月份块
+function generateWeiboMonthBlock(month, photos, year) {
+    const monthName = getMonthName(month);
+    const photoCount = photos.length;
+    
+    const photosHTML = photos.map((photo, index) => `
+        <div class="timeline-photo-item" onclick="openWeiboPhoto(${month}, ${index})">
+            <img src="${MEDIA_BASE_URL}${photo.url}" 
+                 alt="微博照片 ${photo.date || ''}" 
+                 loading="lazy"
+                 onerror="this.style.display='none'">
+            <div class="timeline-photo-overlay">
+                <div class="photo-date">${formatPhotoDate(photo.date)}</div>
+            </div>
+        </div>
+    `).join('');
+    
+    return `
+        <div class="timeline-month-section" data-month="${month}">
+            <div class="month-header" onclick="toggleMonth(${month})">
+                <div class="month-info">
+                    <h3 class="month-title">${monthName}</h3>
+                    <span class="month-count">${photoCount}张微博照片</span>
+                </div>
+                <div class="month-toggle">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="month-content expanded" data-month-content="${month}">
+                <div class="timeline-photos-grid">
+                    ${photosHTML}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// 打开微博时间轴照片lightbox
+function openWeiboPhoto(month, photoIndex) {
+    if (!currentWeiboTimelineData.photos_by_month || !currentWeiboTimelineData.photos_by_month[month]) {
+        return;
+    }
+    
+    const monthPhotos = currentWeiboTimelineData.photos_by_month[month];
+    const photosWithFullUrl = monthPhotos.map(photo => ({
+        ...photo,
+        url: MEDIA_BASE_URL + photo.url
+    }));
+    
+    openLightbox(photosWithFullUrl, photoIndex);
+}
 
 // 切换留言墙设计方案（开发用，可以在控制台调用）
 function switchMessageWallStyle(style) {
@@ -1036,4 +1457,92 @@ async function loadHomeMessageWallMinimal() {
     } catch (error) {
         console.error('Error loading minimal message wall:', error);
     }
+}
+
+// ===== 点赞功能 =====
+
+// 切换点赞状态
+async function toggleLike(messageId) {
+    const likeBtn = document.getElementById(`like-btn-${messageId}`);
+    const likeIcon = document.getElementById(`like-icon-${messageId}`);
+    const likeCount = document.getElementById(`like-count-${messageId}`);
+    
+    if (!likeBtn || !likeIcon || !likeCount) return;
+    
+    // 防止重复点击
+    if (likeBtn.disabled) return;
+    
+    try {
+        likeBtn.disabled = true;
+        
+        // 检查当前状态
+        const isLiked = likeIcon.classList.contains('liked');
+        
+        if (isLiked) {
+            // 取消点赞
+            const response = await axios.delete(`${API_BASE_URL}/messages/${messageId}/like`);
+            likeIcon.classList.remove('liked');
+            likeCount.textContent = response.data.likes_count;
+        } else {
+            // 点赞
+            const response = await axios.post(`${API_BASE_URL}/messages/${messageId}/like`);
+            likeIcon.classList.add('liked');
+            likeCount.textContent = response.data.likes_count;
+        }
+        
+    } catch (error) {
+        console.error('Error toggling like:', error);
+        
+        if (error.response?.status === 400) {
+            // 显示错误信息（已点赞或未点赞）
+            const message = error.response.data.detail || '操作失败';
+            showToast(message, 'warning');
+        } else if (error.response?.status === 404) {
+            showToast('留言不存在或未通过审核', 'error');
+        } else {
+            showToast('网络错误，请稍后重试', 'error');
+        }
+    } finally {
+        likeBtn.disabled = false;
+    }
+}
+
+// 检查点赞状态
+async function checkLikeStatus(messageId) {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/messages/${messageId}/like-status`);
+        const likeIcon = document.getElementById(`like-icon-${messageId}`);
+        
+        if (likeIcon && response.data.liked) {
+            likeIcon.classList.add('liked');
+        }
+    } catch (error) {
+        console.error('Error checking like status:', error);
+    }
+}
+
+// 显示简单提示
+function showToast(message, type = 'info') {
+    // 创建toast元素
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    
+    // 添加到页面
+    document.body.appendChild(toast);
+    
+    // 显示动画
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 100);
+    
+    // 3秒后自动移除
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, 3000);
 }

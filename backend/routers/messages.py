@@ -5,10 +5,10 @@ from typing import List, Optional
 import re
 import datetime
 from core.database import get_db, verify_admin_key
-from models import Message, BannedWord
+from models import Message, BannedWord, MessageLike
 from schemas import (
     MessageCreate, MessageResponse, MessageAdminResponse, 
-    MessageUpdate, MessageStatsResponse
+    MessageUpdate, MessageStatsResponse, MessageLikeResponse
 )
 
 router = APIRouter()
@@ -202,3 +202,89 @@ def add_banned_word(word: str, severity: str = "medium", db: Session = Depends(g
 def get_banned_words(db: Session = Depends(get_db), admin_verified: bool = Depends(verify_admin_key)):
     """Get all banned words (requires API key)"""
     return db.query(BannedWord).all()
+
+# Message like endpoints
+@router.post("/messages/{message_id}/like", response_model=dict)
+def like_message(message_id: int, request: Request, db: Session = Depends(get_db)):
+    """点赞留言 (public endpoint)"""
+    client_ip = request.client.host
+    
+    # 检查留言是否存在且已审核通过
+    message = db.query(Message).filter(
+        Message.id == message_id,
+        Message.status == "approved"
+    ).first()
+    if not message:
+        raise HTTPException(status_code=404, detail="Message not found or not approved")
+    
+    # 检查IP是否已经点赞过
+    existing_like = db.query(MessageLike).filter(
+        MessageLike.message_id == message_id,
+        MessageLike.ip_address == client_ip
+    ).first()
+    
+    if existing_like:
+        raise HTTPException(status_code=400, detail="You have already liked this message")
+    
+    # 创建点赞记录
+    like = MessageLike(
+        message_id=message_id,
+        ip_address=client_ip
+    )
+    db.add(like)
+    
+    # 更新留言的点赞数量
+    message.likes_count += 1
+    
+    db.commit()
+    
+    return {
+        "message": "点赞成功",
+        "likes_count": message.likes_count
+    }
+
+@router.delete("/messages/{message_id}/like", response_model=dict)
+def unlike_message(message_id: int, request: Request, db: Session = Depends(get_db)):
+    """取消点赞留言 (public endpoint)"""
+    client_ip = request.client.host
+    
+    # 检查留言是否存在
+    message = db.query(Message).filter(Message.id == message_id).first()
+    if not message:
+        raise HTTPException(status_code=404, detail="Message not found")
+    
+    # 查找点赞记录
+    like = db.query(MessageLike).filter(
+        MessageLike.message_id == message_id,
+        MessageLike.ip_address == client_ip
+    ).first()
+    
+    if not like:
+        raise HTTPException(status_code=400, detail="You haven't liked this message")
+    
+    # 删除点赞记录
+    db.delete(like)
+    
+    # 更新留言的点赞数量
+    message.likes_count = max(0, message.likes_count - 1)
+    
+    db.commit()
+    
+    return {
+        "message": "取消点赞成功",
+        "likes_count": message.likes_count
+    }
+
+@router.get("/messages/{message_id}/like-status", response_model=dict)
+def get_like_status(message_id: int, request: Request, db: Session = Depends(get_db)):
+    """检查当前IP是否已点赞该留言"""
+    client_ip = request.client.host
+    
+    existing_like = db.query(MessageLike).filter(
+        MessageLike.message_id == message_id,
+        MessageLike.ip_address == client_ip
+    ).first()
+    
+    return {
+        "liked": existing_like is not None
+    }

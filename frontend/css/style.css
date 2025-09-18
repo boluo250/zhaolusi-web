@@ -9,6 +9,8 @@
     --accent-pink: #f4c2c2;
     --soft-shadow: 0 4px 20px rgba(107, 91, 115, 0.1);
     --warm-shadow: 0 8px 30px rgba(107, 91, 115, 0.15);
+    --timeline-line: #e8e2db;
+    --timeline-dot: #a08a7a;
 }
 
 * {
@@ -514,6 +516,17 @@ body {
     display: block;
 }
 
+/* 页面标题样式 - 统一处理所有页面标题 */
+.page h1 {
+    font-family: 'Noto Serif SC', serif !important;
+    font-size: 2.5rem !important;
+    color: var(--deep-brown) !important;
+    text-align: center !important;
+    margin-top: 2rem !important;
+    margin-bottom: 2rem !important;
+    padding-top: 1rem !important;
+}
+
 /* 响应式设计 */
 @media (max-width: 1024px) {
     .hero-section {
@@ -822,6 +835,99 @@ body {
     line-height: 1.8;
     white-space: pre-wrap;
     word-break: break-word;
+    margin-bottom: 1rem;
+}
+
+/* 留言操作按钮 */
+.message-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(139, 69, 19, 0.1);
+}
+
+.like-btn {
+    background: none;
+    border: none;
+    color: var(--warm-brown);
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+}
+
+.like-btn:hover {
+    background-color: rgba(255, 192, 203, 0.2);
+    transform: translateY(-1px);
+}
+
+.like-btn .fas.fa-heart {
+    color: #ccc;
+    transition: all 0.3s ease;
+}
+
+.like-btn .fas.fa-heart.liked {
+    color: #ff69b4;
+    animation: heartBeat 0.6s ease-in-out;
+}
+
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.2); }
+    50% { transform: scale(1); }
+    75% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.like-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Toast 提示样式 */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.3s ease;
+    max-width: 300px;
+}
+
+.toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.toast-success {
+    border-left: 4px solid #22c55e;
+    color: #16a34a;
+}
+
+.toast-error {
+    border-left: 4px solid #ef4444;
+    color: #dc2626;
+}
+
+.toast-warning {
+    border-left: 4px solid #f59e0b;
+    color: #d97706;
+}
+
+.toast-info {
+    border-left: 4px solid #3b82f6;
+    color: #2563eb;
 }
 
 /* 成功/错误消息 */
@@ -1187,4 +1293,328 @@ body {
     transform: translateY(-4px);
     box-shadow: var(--warm-shadow);
     border-color: var(--accent-pink);
+}
+
+/* ===== 照片时间轴样式 ===== */
+
+/* 年份选择器 */
+.year-selector-container {
+    background: var(--cream-white);
+    border: 1px solid var(--light-brown);
+    border-radius: 20px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--soft-shadow);
+}
+
+.year-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.year-btn {
+    background: var(--soft-beige);
+    border: 2px solid var(--light-brown);
+    border-radius: 25px;
+    padding: 0.8rem 1.5rem;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--warm-brown);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    min-width: 120px;
+}
+
+.year-btn:hover {
+    background: var(--accent-pink);
+    border-color: var(--warm-brown);
+    transform: translateY(-2px);
+    box-shadow: var(--soft-shadow);
+}
+
+.year-btn.active {
+    background: var(--warm-brown);
+    color: var(--cream-white);
+    border-color: var(--deep-brown);
+    box-shadow: var(--warm-shadow);
+}
+
+.year-count {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    font-weight: 400;
+}
+
+/* 时间轴容器 */
+.photo-timeline {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.timeline-container {
+    background: var(--cream-white);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: var(--soft-shadow);
+    position: relative;
+}
+
+.timeline-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid var(--light-brown);
+}
+
+.timeline-header h2 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 2rem;
+    color: var(--deep-brown);
+    margin-bottom: 0.5rem;
+}
+
+.timeline-subtitle {
+    color: var(--warm-brown);
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* 时间轴内容 */
+.timeline-content {
+    position: relative;
+}
+
+.timeline-content::before {
+    content: '';
+    position: absolute;
+    left: 2rem;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--timeline-line), var(--light-brown));
+    border-radius: 2px;
+}
+
+/* 月份区块 */
+.month-section {
+    position: relative;
+    margin-bottom: 3rem;
+}
+
+.month-section::before {
+    content: '';
+    position: absolute;
+    left: 1.25rem;
+    top: 1.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    background: var(--timeline-dot);
+    border: 4px solid var(--cream-white);
+    border-radius: 50%;
+    z-index: 2;
+    box-shadow: 0 0 0 3px var(--light-brown);
+}
+
+.month-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem 1.5rem 4.5rem;
+    background: var(--soft-beige);
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+}
+
+.month-header:hover {
+    background: var(--accent-pink);
+    transform: translateX(10px);
+}
+
+.month-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.month-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.4rem;
+    color: var(--deep-brown);
+    margin: 0;
+}
+
+.month-count {
+    color: var(--warm-brown);
+    font-size: 0.9rem;
+    font-weight: 400;
+}
+
+.month-toggle {
+    display: flex;
+    align-items: center;
+    color: var(--warm-brown);
+    font-size: 1.2rem;
+}
+
+.month-toggle i {
+    transition: transform 0.3s ease;
+}
+
+/* 月份内容 */
+.month-content {
+    margin-left: 4.5rem;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+.month-content.expanded {
+    max-height: none;
+    opacity: 1;
+    padding: 0;
+}
+
+.month-content.collapsed {
+    max-height: 0;
+    opacity: 0;
+    padding: 0;
+}
+
+/* 照片网格 */
+.timeline-photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--warm-white);
+    border-radius: 15px;
+    border: 2px solid var(--light-brown);
+}
+
+.timeline-photo-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--soft-beige);
+}
+
+.timeline-photo-item:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: var(--warm-shadow);
+}
+
+.timeline-photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.timeline-photo-item:hover img {
+    transform: scale(1.1);
+}
+
+.photo-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(107, 91, 115, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    color: var(--cream-white);
+    font-size: 1.5rem;
+}
+
+.timeline-photo-item:hover .photo-overlay {
+    opacity: 1;
+}
+
+/* 加载和错误状态 */
+.year-selector-loading,
+.year-selector-error,
+.no-years,
+.timeline-loading,
+.timeline-error,
+.timeline-empty {
+    text-align: center;
+    padding: 2rem;
+    color: var(--warm-brown);
+    font-style: italic;
+}
+
+.year-selector-error,
+.timeline-error {
+    color: #e74c3c;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .timeline-content::before {
+        left: 1rem;
+    }
+    
+    .month-section::before {
+        left: 0.25rem;
+    }
+    
+    .month-header {
+        padding: 1rem 1rem 1rem 2.5rem;
+    }
+    
+    .month-content {
+        margin-left: 2.5rem;
+    }
+    
+    .timeline-photos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 0.8rem;
+        padding: 1rem;
+    }
+    
+    .year-btn {
+        min-width: 100px;
+        padding: 0.6rem 1.2rem;
+    }
+    
+    .timeline-container {
+        padding: 1.5rem;
+    }
+    
+    .timeline-header h2 {
+        font-size: 1.6rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .timeline-photos-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .year-selector {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .year-btn {
+        width: 100%;
+        max-width: 200px;
+    }
 }

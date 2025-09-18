@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>点赞功能测试</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .message-item { 
+            border: 1px solid #ddd; 
+            padding: 20px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+        }
+        .message-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(139, 69, 19, 0.1);
+        }
+        .like-btn {
+            background: none;
+            border: none;
+            color: #8b4513;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+        .like-btn:hover {
+            background-color: rgba(255, 192, 203, 0.2);
+            transform: translateY(-1px);
+        }
+        .like-btn .fas.fa-heart {
+            color: #ccc;
+            transition: all 0.3s ease;
+        }
+        .like-btn .fas.fa-heart.liked {
+            color: #ff69b4;
+        }
+    </style>
+</head>
+<body>
+    <h1>点赞功能测试</h1>
+    <div id="messages-container">加载中...</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const API_BASE_URL = 'http://localhost:8001/api';
+
+        // 加载留言
+        async function loadMessages() {
+            try {
+                const response = await axios.get(`${API_BASE_URL}/messages`);
+                const messages = response.data || [];
+                displayMessages(messages);
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                document.getElementById('messages-container').innerHTML = '<p>加载失败</p>';
+            }
+        }
+
+        // 显示留言
+        function displayMessages(messages) {
+            const container = document.getElementById('messages-container');
+            
+            if (!messages || messages.length === 0) {
+                container.innerHTML = '<p>没有留言</p>';
+                return;
+            }
+            
+            const html = messages.map(message => `
+                <div class="message-item">
+                    <div><strong>${escapeHtml(message.nickname)}</strong></div>
+                    <div>${escapeHtml(message.content)}</div>
+                    <div class="message-actions">
+                        <button class="like-btn" onclick="toggleLike(${message.id})" id="like-btn-${message.id}">
+                            <i class="fas fa-heart" id="like-icon-${message.id}"></i>
+                            <span id="like-count-${message.id}">${message.likes_count || 0}</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+            
+            // 检查每个留言的点赞状态
+            messages.forEach(message => {
+                checkLikeStatus(message.id);
+            });
+        }
+
+        // 点赞功能
+        async function toggleLike(messageId) {
+            const likeBtn = document.getElementById(`like-btn-${messageId}`);
+            const likeIcon = document.getElementById(`like-icon-${messageId}`);
+            const likeCount = document.getElementById(`like-count-${messageId}`);
+            
+            if (!likeBtn || !likeIcon || !likeCount) return;
+            
+            try {
+                likeBtn.disabled = true;
+                
+                const isLiked = likeIcon.classList.contains('liked');
+                
+                if (isLiked) {
+                    const response = await axios.delete(`${API_BASE_URL}/messages/${messageId}/like`);
+                    likeIcon.classList.remove('liked');
+                    likeCount.textContent = response.data.likes_count;
+                } else {
+                    const response = await axios.post(`${API_BASE_URL}/messages/${messageId}/like`);
+                    likeIcon.classList.add('liked');
+                    likeCount.textContent = response.data.likes_count;
+                }
+                
+            } catch (error) {
+                console.error('Error toggling like:', error);
+                alert('操作失败：' + (error.response?.data?.detail || error.message));
+            } finally {
+                likeBtn.disabled = false;
+            }
+        }
+
+        // 检查点赞状态
+        async function checkLikeStatus(messageId) {
+            try {
+                const response = await axios.get(`${API_BASE_URL}/messages/${messageId}/like-status`);
+                const likeIcon = document.getElementById(`like-icon-${messageId}`);
+                
+                if (likeIcon && response.data.liked) {
+                    likeIcon.classList.add('liked');
+                }
+            } catch (error) {
+                console.error('Error checking like status:', error);
+            }
+        }
+
+        // HTML转义
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', loadMessages);
+    </script>
+</body>
+</html>

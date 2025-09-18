@@ -4,6 +4,8 @@ from sqlalchemy import func
 from typing import List, Optional
 import os
 import random
+import re
+from datetime import datetime
 from core.database import get_db, settings
 from models import Photo, Video
 from schemas import (
@@ -13,6 +15,27 @@ from schemas import (
 )
 
 router = APIRouter()
+
+# 解析文件名中的日期信息
+def parse_filename_date(filename):
+    """
+    解析文件名中的日期，支持格式：YYYY年MM月DD日N.jpg
+    例如：2025年08月16日1.jpg -> 2025-08-16
+    """
+    try:
+        # 匹配 YYYY年MM月DD日N.jpg 格式
+        pattern = r'(\d{4})年(\d{2})月(\d{2})日'
+        match = re.search(pattern, filename)
+        
+        if match:
+            year = int(match.group(1))
+            month = int(match.group(2))
+            day = int(match.group(3))
+            return datetime(year, month, day)
+    except ValueError:
+        pass
+    
+    return None
 
 # Photo endpoints
 @router.get("/photos", response_model=List[PhotoResponse])
@@ -166,19 +189,136 @@ def get_wall_photos():
                           if f.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp'))]
             
             if image_files:
-                # 随机打乱照片顺序
-                random.shuffle(image_files)
+                # 解析文件名中的日期并排序
                 wall_photos = []
                 for image_file in image_files:
+                    photo_date = parse_filename_date(image_file)
                     wall_photos.append({
                         "filename": image_file,
-                        "url": f"{settings.media_url}wall-pic/{image_file}"
+                        "url": f"{settings.media_url}wall-pic/{image_file}",
+                        "date": photo_date.isoformat() if photo_date else None
                     })
+                
+                # 按日期排序（最新的在前）
+                wall_photos.sort(key=lambda x: x["date"] or "1900-01-01", reverse=True)
                 return {"photos": wall_photos}
             else:
                 return {"photos": []}
         else:
             raise HTTPException(status_code=404, detail="Wall-pic directory not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Get available years in wall-pic directory
+@router.get("/wall-photos/years")
+def get_wall_photo_years():
+    wall_pic_dir = os.path.join(settings.media_root, 'wall-pic')
+    
+    try:
+        if not os.path.exists(wall_pic_dir):
+            raise HTTPException(status_code=404, detail="Wall-pic directory not found")
+        
+        image_files = [f for f in os.listdir(wall_pic_dir) 
+                      if f.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp'))]
+        
+        # 按文件名解析年份
+        years_count = {}
+        for image_file in image_files:
+            photo_date = parse_filename_date(image_file)
+            if photo_date:
+                year = photo_date.year
+                years_count[year] = years_count.get(year, 0) + 1
+        
+        # 生成年份数据
+        years = []
+        for year, count in years_count.items():
+            years.append({
+                "year": year,
+                "photo_count": count
+            })
+        
+        # 按年份降序排列
+        years.sort(key=lambda x: x["year"], reverse=True)
+        return {"years": years}
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Get photos by year and optionally by month
+@router.get("/wall-photos/{year}")
+def get_wall_photos_by_year(
+    year: int,
+    month: Optional[int] = Query(None, ge=1, le=12)
+):
+    wall_pic_dir = os.path.join(settings.media_root, 'wall-pic')
+    
+    try:
+        if not os.path.exists(wall_pic_dir):
+            raise HTTPException(status_code=404, detail=f"Wall-pic directory not found")
+        
+        image_files = [f for f in os.listdir(wall_pic_dir) 
+                      if f.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp'))]
+        
+        if not image_files:
+            return {"photos": [], "months": []}
+        
+        # 按文件名解析日期，筛选指定年份的照片
+        photos_by_month = {}
+        for image_file in image_files:
+            photo_date = parse_filename_date(image_file)
+            if photo_date and photo_date.year == year:
+                file_month = photo_date.month
+                
+                if file_month not in photos_by_month:
+                    photos_by_month[file_month] = []
+                
+                photos_by_month[file_month].append({
+                    "filename": image_file,
+                    "url": f"{settings.media_url}wall-pic/{image_file}",
+                    "date": photo_date.isoformat()
+                })
+        
+        # 按月份排序照片（最新的在前）
+        for month_photos in photos_by_month.values():
+            month_photos.sort(key=lambda x: x["date"], reverse=True)
+        
+        # 生成月份统计
+        months = []
+        for month_num in sorted(photos_by_month.keys(), reverse=True):
+            months.append({
+                "month": month_num,
+                "photo_count": len(photos_by_month[month_num])
+            })
+        
+        # 如果指定了月份，只返回该月份的照片
+        if month:
+            if month in photos_by_month:
+                return {
+                    "photos": photos_by_month[month],
+                    "months": months,
+                    "year": year,
+                    "selected_month": month
+                }
+            else:
+                return {
+                    "photos": [],
+                    "months": months,
+                    "year": year,
+                    "selected_month": month
+                }
+        
+        # 返回所有照片，按月份分组
+        all_photos = []
+        for month_num in sorted(photos_by_month.keys(), reverse=True):
+            all_photos.extend(photos_by_month[month_num])
+        
+        return {
+            "photos": all_photos,
+            "photos_by_month": photos_by_month,
+            "months": months,
+            "year": year
+        }
+    
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -200,5 +340,170 @@ def get_random_hero_image():
                 raise HTTPException(status_code=404, detail="No images found")
         else:
             raise HTTPException(status_code=404, detail="Image directory not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# 解析微博文件名中的日期信息
+def parse_weibo_filename_date(filename):
+    """
+    解析微博文件名中的日期，支持格式：YYYY-MM-DD.jpg 或 YYYY-MM-DD-N.jpg
+    例如：2015-11-12.jpg -> 2015-11-12
+    """
+    try:
+        # 匹配 YYYY-MM-DD 格式
+        pattern = r'(\d{4})-(\d{2})-(\d{2})'
+        match = re.search(pattern, filename)
+        
+        if match:
+            year = int(match.group(1))
+            month = int(match.group(2))
+            day = int(match.group(3))
+            return datetime(year, month, day)
+    except ValueError:
+        pass
+    
+    return None
+
+# Weibo photos endpoints
+@router.get("/weibo-photos")
+def get_weibo_photos():
+    weibo_dir = os.path.join(settings.media_root, 'weibo')
+    
+    try:
+        if os.path.exists(weibo_dir):
+            image_files = [f for f in os.listdir(weibo_dir) 
+                          if f.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp'))]
+            
+            if image_files:
+                # 解析文件名中的日期并排序
+                weibo_photos = []
+                for image_file in image_files:
+                    photo_date = parse_weibo_filename_date(image_file)
+                    weibo_photos.append({
+                        "filename": image_file,
+                        "url": f"{settings.media_url}weibo/{image_file}",
+                        "date": photo_date.isoformat() if photo_date else None
+                    })
+                
+                # 按日期排序（最新的在前）
+                weibo_photos.sort(key=lambda x: x["date"] or "1900-01-01", reverse=True)
+                return {"photos": weibo_photos}
+            else:
+                return {"photos": []}
+        else:
+            raise HTTPException(status_code=404, detail="Weibo directory not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Get available years in weibo directory
+@router.get("/weibo-photos/years")
+def get_weibo_photo_years():
+    weibo_dir = os.path.join(settings.media_root, 'weibo')
+    
+    try:
+        if not os.path.exists(weibo_dir):
+            raise HTTPException(status_code=404, detail="Weibo directory not found")
+        
+        image_files = [f for f in os.listdir(weibo_dir) 
+                      if f.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp'))]
+        
+        # 按文件名解析年份
+        years_count = {}
+        for image_file in image_files:
+            photo_date = parse_weibo_filename_date(image_file)
+            if photo_date:
+                year = photo_date.year
+                years_count[year] = years_count.get(year, 0) + 1
+        
+        # 生成年份数据
+        years = []
+        for year, count in years_count.items():
+            years.append({
+                "year": year,
+                "photo_count": count
+            })
+        
+        # 按年份降序排列
+        years.sort(key=lambda x: x["year"], reverse=True)
+        return {"years": years}
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Get weibo photos by year and optionally by month
+@router.get("/weibo-photos/{year}")
+def get_weibo_photos_by_year(
+    year: int,
+    month: Optional[int] = Query(None, ge=1, le=12)
+):
+    weibo_dir = os.path.join(settings.media_root, 'weibo')
+    
+    try:
+        if not os.path.exists(weibo_dir):
+            raise HTTPException(status_code=404, detail=f"Weibo directory not found")
+        
+        image_files = [f for f in os.listdir(weibo_dir) 
+                      if f.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp'))]
+        
+        if not image_files:
+            return {"photos": [], "months": []}
+        
+        # 按文件名解析日期，筛选指定年份的照片
+        photos_by_month = {}
+        for image_file in image_files:
+            photo_date = parse_weibo_filename_date(image_file)
+            if photo_date and photo_date.year == year:
+                file_month = photo_date.month
+                
+                if file_month not in photos_by_month:
+                    photos_by_month[file_month] = []
+                
+                photos_by_month[file_month].append({
+                    "filename": image_file,
+                    "url": f"{settings.media_url}weibo/{image_file}",
+                    "date": photo_date.isoformat()
+                })
+        
+        # 按月份排序照片（最新的在前）
+        for month_photos in photos_by_month.values():
+            month_photos.sort(key=lambda x: x["date"], reverse=True)
+        
+        # 生成月份统计
+        months = []
+        for month_num in sorted(photos_by_month.keys(), reverse=True):
+            months.append({
+                "month": month_num,
+                "photo_count": len(photos_by_month[month_num])
+            })
+        
+        # 如果指定了月份，只返回该月份的照片
+        if month:
+            if month in photos_by_month:
+                return {
+                    "photos": photos_by_month[month],
+                    "months": months,
+                    "year": year,
+                    "selected_month": month
+                }
+            else:
+                return {
+                    "photos": [],
+                    "months": months,
+                    "year": year,
+                    "selected_month": month
+                }
+        
+        # 返回所有照片，按月份分组
+        all_photos = []
+        for month_num in sorted(photos_by_month.keys(), reverse=True):
+            all_photos.extend(photos_by_month[month_num])
+        
+        return {
+            "photos": all_photos,
+            "photos_by_month": photos_by_month,
+            "months": months,
+            "year": year
+        }
+    
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

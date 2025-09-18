@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>赵露思 - life</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
@@ -27,9 +28,12 @@
                         <a class="nav-link" href="#" onclick="showPage('photos')">照片</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('weibo')">微博</a>
+                    </li>
+                    <li class="nav-item" style="display: none;">
                         <a class="nav-link" href="#" onclick="showPage('videos')">视频</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" style="display: none;">
                         <a class="nav-link" href="#" onclick="showPage('timeline')">人生轨迹</a>
                     </li>
                     <li class="nav-item">
@@ -52,7 +56,7 @@
                     <div class="hero-quote">
                         "最美好的时光，往往藏在最平凡的日子里。"
                     </div>
-                    <a href="#" class="explore-btn" onclick="showPage('photos')">开始探索</a>
+                    <a href="https://www.instagram.com/rooosyzh09/" class="explore-btn" target="_blank" rel="noopener noreferrer">Instagram</a>
                 </div>
                 <div class="hero-image">
                     <img src="" alt="主要展示图片" id="hero-image">
@@ -81,9 +85,14 @@
                     <a href="#" class="explore-btn" onclick="showPage('messages')">查看更多留言</a>
                 </div>
             </section>
+            
+            <!-- 底部声明 -->
+            <div class="text-center mt-5 mb-4">
+                <p class="text-muted small">粉丝搭建（非官方）</p>
+            </div>
 
-            <!-- 底部内容区域 -->
-            <div class="bottom-content">
+            <!-- 底部内容区域 (隐藏 - 未来使用) -->
+            <div class="bottom-content" style="display: none;">
                 <!-- 视频区域 -->
                 <section class="video-section">
                     <h3 class="section-subtitle">推荐视频</h3>
@@ -104,28 +113,41 @@
             </div>
         </div>
 
-        <!-- 照片页面 -->
-        <div id="photos-page" class="page" style="display: none;">
-            <h1>照片集</h1>
-            <div class="mb-3">
-                <select id="photo-category-filter" class="form-select" style="width: 200px; display: inline-block;">
-                    <option value="">所有分类</option>
-                    <option value="travel">旅行</option>
-                    <option value="family">家人</option>
-                    <option value="life">生活</option>
-                    <option value="work">工作</option>
-                    <option value="other">其他</option>
-                </select>
+        <!-- 微博页面 -->
+        <div id="weibo-page" class="page" style="display: none;">
+            <h1>微博时光</h1>
+            
+            <!-- 年份选择器 -->
+            <div class="year-selector-container mb-4">
+                <div class="year-selector" id="weibo-year-selector">
+                    <div class="year-selector-loading">加载年份中...</div>
+                </div>
             </div>
-            <div id="photos-grid" class="row">
-                <!-- 照片网格将在此处动态加载 -->
-            </div>
-            <div id="photos-pagination" class="d-flex justify-content-center mt-4">
-                <!-- 分页将在此处动态加载 -->
+            
+            <!-- 时间轴容器 -->
+            <div class="photo-timeline" id="weibo-timeline">
+                <div class="timeline-loading">请选择年份查看微博照片</div>
             </div>
         </div>
 
-        <!-- 视频页面 -->
+        <!-- 照片页面 -->
+        <div id="photos-page" class="page" style="display: none;">
+            <h1>照片时光</h1>
+            
+            <!-- 年份选择器 -->
+            <div class="year-selector-container mb-4">
+                <div class="year-selector" id="year-selector">
+                    <div class="year-selector-loading">加载年份中...</div>
+                </div>
+            </div>
+            
+            <!-- 时间轴容器 -->
+            <div class="photo-timeline" id="photo-timeline">
+                <div class="timeline-loading">请选择年份查看照片</div>
+            </div>
+        </div>
+
+        <!-- 视频页面 (隐藏 - 未来使用) -->
         <div id="videos-page" class="page" style="display: none;">
             <h1>视频集</h1>
             <div class="mb-3">
@@ -146,7 +168,7 @@
             </div>
         </div>
 
-        <!-- 人生轨迹页面 -->
+        <!-- 人生轨迹页面 (隐藏 - 未来使用) -->
         <div id="timeline-page" class="page" style="display: none;">
             <h1>人生轨迹</h1>
             <div class="mb-3">

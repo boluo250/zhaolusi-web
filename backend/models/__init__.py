@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, Date, Float
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, Date, Float, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from datetime import datetime
 
@@ -53,9 +54,18 @@ class Message(Base):
     ip_address = Column(String(45), nullable=False)  # For spam protection
     status = Column(String(20), default="pending")  # pending, approved, rejected
     spam_score = Column(Float, default=0.0)  # Auto spam detection score
+    likes_count = Column(Integer, default=0)  # 点赞数量
     created_at = Column(DateTime, default=func.now())
     approved_at = Column(DateTime, nullable=True)
     approved_by = Column(String(50), default="")
+
+class MessageLike(Base):
+    __tablename__ = "message_likes"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    message_id = Column(Integer, ForeignKey("messages.id"), nullable=False)
+    ip_address = Column(String(45), nullable=False)  # 用IP限制重复点赞
+    created_at = Column(DateTime, default=func.now())
 
 class BannedWord(Base):
     __tablename__ = "banned_words"

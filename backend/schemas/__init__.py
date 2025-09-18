@@ -143,6 +143,7 @@ class MessageResponse(BaseModel):
     content: str
     email: str
     status: MessageStatusEnum
+    likes_count: int  # 添加点赞数量
     created_at: datetime
     
     class Config:
@@ -162,3 +163,12 @@ class MessageStatsResponse(BaseModel):
     total_messages: int
     pending_messages: int
     approved_messages: int
+
+# Message Like schemas
+class MessageLikeResponse(BaseModel):
+    id: int
+    message_id: int
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
