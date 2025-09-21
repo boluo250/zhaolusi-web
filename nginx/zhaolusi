@@ -1,0 +1,154 @@
+# Rate limiting zone for ZhaoLuSi site
+limit_req_zone $binary_remote_addr zone=zhaolusi_limit:10m rate=10r/s;
+limit_req_zone $binary_remote_addr zone=zhaolusi_static:10m rate=30r/s;
+
+# HTTP block: Redirect all HTTP to HTTPS
+server {
+    listen 80;
+    server_name zhaolusi.life www.zhaolusi.life;
+    return 301 https://zhaolusi.life$request_uri;
+}
+
+# HTTPS block: Main domain
+server {
+    listen 443 ssl http2;
+    server_name zhaolusi.life;
+
+    # Block suspicious user agents
+    if ($http_user_agent ~* "Go-http-client|curl|wget") {
+        return 403;
+    }
+
+    # SSL certificate (Cloudflare Origin CA or Let's Encrypt)
+    ssl_certificate /etc/ssl/certs/zhaolusi.life_bundle.pem;
+    ssl_certificate_key /etc/ssl/private/zhaolusi.life.key;
+    # If using Let's Encrypt, replace with:
+    # ssl_certificate /etc/letsencrypt/live/zhaolusi.life/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/zhaolusi.life/privkey.pem;
+
+    # SSL settings
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+    ssl_stapling on;
+    ssl_stapling_verify on;
+
+    # Security headers
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+
+    # Root directory for frontend static files
+    root /home/ubuntu/zhaolusi-web/frontend;
+    index index.html;
+
+    # Frontend static files - serve directly
+    location / {
+        try_files $uri $uri/ /index.html;
+        
+        # Cache static assets
+        location ~* \.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+            access_log off;
+        }
+        
+        # Rate limiting for static files
+        limit_req zone=zhaolusi_static burst=50 nodelay;
+    }
+
+    # API routes - reverse proxy to Gunicorn backend
+    location /api/ {
+        proxy_pass http://unix:/run/gunicorn/zhaolusi.sock;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_read_timeout 300s;
+        proxy_connect_timeout 75s;
+        
+        # Rate limiting for API
+        limit_req zone=zhaolusi_limit burst=20 nodelay;
+    }
+
+    # Media files - serve directly with optimizations
+    location /media/ {
+        alias /home/ubuntu/zhaolusi-web/media/;
+        
+        # Cache media files
+        expires 7d;
+        add_header Cache-Control "public";
+        
+        # Image optimization headers
+        location ~* \.(jpg|jpeg|png|gif|webp)$ {
+            add_header Vary Accept;
+            expires 30d;
+        }
+        
+        # Video files
+        location ~* \.(mp4|webm|ogg|avi|mov)$ {
+            expires 30d;
+            add_header Cache-Control "public";
+            add_header Accept-Ranges bytes;
+        }
+        
+        # Rate limiting for media
+        limit_req zone=zhaolusi_static burst=100 nodelay;
+    }
+
+    # Health check endpoint
+    location /health {
+        proxy_pass http://unix:/run/gunicorn/zhaolusi.sock;
+        access_log off;
+    }
+
+    # Robots.txt
+    location /robots.txt {
+        alias /home/ubuntu/zhaolusi-web/frontend/robots.txt;
+        access_log off;
+    }
+
+    # Disable favicon logs
+    location = /favicon.ico {
+        alias /home/ubuntu/zhaolusi-web/frontend/favicon.ico;
+        expires 30d;
+        access_log off;
+        log_not_found off;
+    }
+
+    # Security: Block sensitive files
+    location ~ /\. {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+    
+    location ~ \.(sql|bak|backup|log)$ {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+
+    # Enable access logging
+    access_log /var/log/nginx/zhaolusi.access.log;
+    error_log /var/log/nginx/zhaolusi.error.log;
+}
+
+# HTTPS block: Redirect www to non-www
+server {
+    listen 443 ssl http2;
+    server_name www.zhaolusi.life;
+
+    # Same certificate (Cloudflare Origin CA or Let's Encrypt)
+    ssl_certificate /etc/ssl/certs/zhaolusi.life_bundle.pem;
+    ssl_certificate_key /etc/ssl/private/zhaolusi.life.key;
+    # If using Let's Encrypt:
+    # ssl_certificate /etc/letsencrypt/live/zhaolusi.life/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/zhaolusi.life/privkey.pem;
+
+    return 301 https://zhaolusi.life$request_uri;
+}

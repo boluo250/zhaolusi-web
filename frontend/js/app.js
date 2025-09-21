@@ -1,6 +1,16 @@
-// API 基础配置
-const API_BASE_URL = 'http://localhost:8001/api';
-const MEDIA_BASE_URL = 'http://127.0.0.1:8001';
+// API 与媒体基础配置（自适应本地与生产环境）
+// - 本地开发（localhost/127.0.0.1/端口3000）：通过 8001 访问后端与媒体
+// - 生产环境（zhaolusi.life）：与前端同源，走 Nginx 反向代理与 /media 静态目录
+const isLocalEnv = (
+  ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname) ||
+  window.location.port === '3000'
+);
+const API_BASE_URL = isLocalEnv
+  ? `${window.location.protocol}//${window.location.hostname}:8001/api`
+  : `/api`;
+const MEDIA_BASE_URL = isLocalEnv
+  ? `${window.location.protocol}//${window.location.hostname}:8001`
+  : '';
 
 // 页面导航
 function showPage(pageName) {
@@ -38,7 +48,7 @@ function showPage(pageName) {
 // 加载随机hero图片
 async function loadRandomHeroImage() {
     try {
-        const response = await axios.get(`${API_BASE_URL}/gallery/random-hero`);
+        const response = await axios.get(`${API_BASE_URL.replace('/api', '')}/api/random-hero-image`);
         const heroImg = document.querySelector('#hero-image');
         if (heroImg && response.data.image_url) {
             // 构建完整的图片URL

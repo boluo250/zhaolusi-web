@@ -50,7 +50,7 @@ def health_check():
 @app.get("/api/random-hero-image")
 def get_random_hero_image():
     """Get a random image from media/pic directory for hero section"""
-    pic_dir = "media/pic"
+    pic_dir = "/home/ubuntu/zhaolusi-web/media/pic"
     
     if not os.path.exists(pic_dir):
         return JSONResponse(
